@@ -56,8 +56,7 @@ class Main:
 	def onload(self,tasc):
 		self.tsc = tasc
 		self.bans = []
-		self.config = readconfigfile("Manager.conf")
-		self.bans = parselist(self.config["bans"],",")
+		self.bans = parselist(self.app.config["hostports"],",")
 		self.app = tasc.main
 		self.an = parselist(self.app.config["accountsnick"],",")
 		self.ap = parselist(self.app.config["accountspass"],",")
@@ -99,8 +98,8 @@ class Main:
 						socket.send("SAYPRIVATE %s %s\n" % (args[0],b+" Banned"))
 					else:
 						socket.send("SAYPRIVATE %s %s\n" % (args[0],b+" is already banned"))
-				self.config["bans"] = ','.join(self.bans)
-				writeconfigfile("Manager.conf",self.config)
+				self.app.config["bans"] = ','.join(self.bans)
+				self.app.SaveConfig()
 				socket.send("SAYPRIVATE %s %s\n" % (args[0],"Done."))
 			elif command == "SAIDPRIVATE" and len(args) >= 3 and args[1] == "!unban" and args[0] in self.app.admins:
 				toban = args[2:]
@@ -110,8 +109,8 @@ class Main:
 					else:
 						self.bans.remove(b)
 						socket.send("SAYPRIVATE %s %s\n" % (args[0],b+" has been unbanned"))
-				self.config["bans"] = ','.join(self.bans)
-				writeconfigfile("Manager.conf",self.config)
+				self.app.config["bans"] = ','.join(self.bans)
+				self.app.SaveConfig()
 				socket.send("SAYPRIVATE %s %s\n" % (args[0],"Done."))
 			elif command == "SAIDPRIVATE" and len(args) == 2 and args[1] == "!spawn" and args[0] not in self.ul and not self.disabled:
 				if args[0] in self.bans:
