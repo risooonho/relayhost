@@ -64,8 +64,8 @@ class Main:
 	def onload(self,tasc):
 		self.tsc = tasc
 		self.bans = []
-		self.bans = parselist(self.app.config["bans"],",")
 		self.app = tasc.main
+		self.bans = parselist(self.app.config["bans"],",")
 		self.hostports = []
 		for port in parselist(self.app.config["hostports"],","):
 			self.hostports = self.hostports + parseportrange( port )
