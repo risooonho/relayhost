@@ -17,6 +17,14 @@ def loge(s,m):
 		s.send("SAYEX autohost %s\n" % m)
 	except:
 		pass
+def parseportrange(arg):
+	separator = ":"
+	if ( arg.find( separator ) >= 0 ):
+		extremes = parselist(arg,separator)
+		return range( int(extremes[0]), int(extremes[1]) )
+	tempvariable = []
+	tempvariable[0] = int(arg)
+	return tempvariable
 class Main:
 	ul = []
 	listfull = False
@@ -58,8 +66,12 @@ class Main:
 		self.bans = []
 		self.bans = parselist(self.app.config["bans"],",")
 		self.app = tasc.main
-		self.hostports = parselist(self.app.config["hostports"],",")
-		self.controlports = parselist(self.app.config["ahports"],",")
+		self.hostports = []
+		for port in parselist(self.app.config["hostports"],","):
+			self.hostports = self.hostports + parseportrange( port )
+		self.controlports = []
+		for port in parselist(self.app.config["ahports"],","):
+			self.controlports = self.controlports + parseportrange( port )
 		numhosts = min( len(self.hostports), len(self.controlports) ) # number of host is minimum between amount of free ports for host and amount of free ports for control
 		self.an = []
 		basenick = self.app.config["slavesnick"]
