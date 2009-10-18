@@ -59,7 +59,7 @@ class Main:
 		self.bans = parselist(self.app.config["hostports"],",")
 		self.app = tasc.main
 		self.an = parselist(self.app.config["accountsnick"],",")
-		self.ap = parselist(self.app.config["accountspass"],",")
+		self.ap = self.app.config["accountspass"]
 		self.disabled = not bool(int(self.app.config["enabled"]))
 		i = 0
 		for bot in self.an:
@@ -124,7 +124,7 @@ class Main:
 						slot = b
 						break
 				if freeslot:
-					self.threads.append(thread.start_new_thread(self.botthread,(slot,self.an[slot],socket,args[0],self.ap[slot],self)))
+					self.threads.append(thread.start_new_thread(self.botthread,(slot,self.an[slot],socket,args[0],self.ap,self)))
 					socket.send("SAYPRIVATE %s %s\n" %(args[0],self.an[slot]))
 					self.ul.append(args[0])
 					self.botstatus[slot] = True
