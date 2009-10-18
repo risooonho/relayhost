@@ -1,6 +1,6 @@
 from colors import *
 import string
-helptext = "Relayed Host Bot\n Documentation is at http://trac.springlobby.info/wiki/HostManagerProtocol"
+helptext = "Relayed Host Bot\n Documentation is at http://springlobby.info/wiki/1/HostManagerProtocol"
 class Main:
 	def oncommandfromserver(self,command,args,socket):
 		
