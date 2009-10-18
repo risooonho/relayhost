@@ -19,11 +19,13 @@ def loge(s,m):
 		pass
 def parseportrange(arg):
 	separator = ":"
+	tempvariable = []
 	if ( arg.find( separator ) >= 0 ):
 		extremes = parselist(arg,separator)
-		return range( int(extremes[0]), int(extremes[1]) )
-	tempvariable = []
-	tempvariable.append(int(arg))
+		for num in range( int(extremes[0]), int(extremes[1]) ):
+			tempvariable.append(str(num))
+	else:
+		tempvariable.append(arg)
 	return tempvariable
 class Main:
 	ul = []
