@@ -23,7 +23,7 @@ def parseportrange(arg):
 		extremes = parselist(arg,separator)
 		return range( int(extremes[0]), int(extremes[1]) )
 	tempvariable = []
-	tempvariable[0] = int(arg)
+	tempvariable.append(int(arg))
 	return tempvariable
 class Main:
 	ul = []
@@ -76,7 +76,7 @@ class Main:
 		self.an = []
 		basenick = self.app.config["slavesnick"]
 		for i in range( 1, numhosts ): # fill the list of host names with the format of basenick + slot number
-			self.an[i] = ( "%s%i" ,basenick, i )
+			self.an.append( basenick + str(i) )
 		self.ap = self.app.config["slavespass"]
 		self.disabled = not bool(int(self.app.config["enabled"]))
 		i = 0
