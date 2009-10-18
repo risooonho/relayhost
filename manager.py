@@ -56,7 +56,7 @@ class Main:
 	def onload(self,tasc):
 		self.tsc = tasc
 		self.bans = []
-		self.bans = parselist(self.app.config["hostports"],",")
+		self.bans = parselist(self.app.config["bans"],",")
 		self.app = tasc.main
 		self.an = parselist(self.app.config["accountsnick"],",")
 		self.ap = self.app.config["accountspass"]
