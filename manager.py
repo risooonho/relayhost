@@ -34,8 +34,8 @@ class Main:
 			d.update([("admins",self.app.config["admins"])])
 			d.update([("nick",nick)])
 			d.update([("password",p)])
-			d.update([("hostport",parselist(self.app.config["hostports"],",")[slot])])
-			d.update([("ahport",parselist(self.app.config["ahports"],",")[slot])])
+			d.update([("hostport",self.hostports[slot])])
+			d.update([("ahport",self.controlports[slot])])
 			d.update([("plugins","channels,autohost,help")])
 			writeconfigfile(nick+".cfg",d)
 			p = subprocess.Popen(("python","Main.py","-c", "%s" % (nick+".cfg")),stdout=sys.stdout)
@@ -58,7 +58,13 @@ class Main:
 		self.bans = []
 		self.bans = parselist(self.app.config["bans"],",")
 		self.app = tasc.main
-		self.an = parselist(self.app.config["slavesnick"],",")
+		self.hostports = parselist(self.app.config["hostports"],",")
+		self.controlports = parselist(self.app.config["ahports"],",")
+		numhosts = min( len(self.hostports), len(self.controlports) ) # number of host is minimum between amount of free ports for host and amount of free ports for control
+		self.an = []
+		basenick = self.app.config["slavesnick"]
+		for i in range( 1, numhosts ): # fill the list of host names with the format of basenick + slot number
+			self.an[i] = ( "%s%i" ,basenick, i )
 		self.ap = self.app.config["slavespass"]
 		self.disabled = not bool(int(self.app.config["enabled"]))
 		i = 0
