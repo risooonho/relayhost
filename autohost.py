@@ -69,12 +69,6 @@ class Main:
 		try:
 			if p == self.battleowner:
 				if msg.startswith("!"):
-					if msg.startswith("!kick") and msg.count(self.app.config["nick"]) > 0:
-						self.u.sayingame("I'm not stupid like chanserv that mutes itself")
-						return
-					if msg.startswith("!exit"):
-						self.u.sayingame("You cannot ragequit!")
-						return
 					g = msg.replace("!","/")
 					self.u.sayingame(g)
 		except:
