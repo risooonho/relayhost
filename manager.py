@@ -58,8 +58,8 @@ class Main:
 		self.bans = []
 		self.bans = parselist(self.app.config["bans"],",")
 		self.app = tasc.main
-		self.an = parselist(self.app.config["accountsnick"],",")
-		self.ap = self.app.config["accountspass"]
+		self.an = parselist(self.app.config["slavesnick"],",")
+		self.ap = self.app.config["slavespass"]
 		self.disabled = not bool(int(self.app.config["enabled"]))
 		i = 0
 		for bot in self.an:
