@@ -10,3 +10,5 @@ ahports=12000:14000, 5000;
 bans=[][]aweres[],[P][E]aweres[E][T],[PinK]Aweres[t],HOMOTINTTI;
 keepscript=0;
 admins=YOURNICK,YOURNICK2;
+enabled=1;
+springdedpath=/path/to/it;
