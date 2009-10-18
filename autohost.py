@@ -135,7 +135,7 @@ class Main:
 				loge(socket,line)
 			loge(socket,"*** EXCEPTION: END")
 		try:
-			if int(self.config["keepscript"]) == 0:
+			if int(self.app.config["keepscript"]) == 0:
 				os.remove(os.path.join(os.environ['HOME'],"%f.txt" % g))
 		except:
 			pass
@@ -148,7 +148,6 @@ class Main:
 	def onload(self,tasc):
 		try:
 			self.app = tasc.main
-			self.config = readconfigfile("Autohost.cfg")
 			self.hosttime = time.time()
 			thread.start_new_thread(self.timeoutthread,())
 			self.u = udpinterface.UDPint(int(self.app.config["ahport"]),self.mscb,self.gs,self.ecb)
@@ -166,7 +165,7 @@ class Main:
 			self.users.update([(args[0],0)])
 		if command == "CLIENTSTATUS" and len(args) > 1:
 			self.users.update([(args[0],int(args[1]))])
-		if command == "SAIDPRIVATE" and args[0] not in self.app.config["bannedusers"] and args[0] == self.app.config["spawnedby"]:
+		if command == "SAIDPRIVATE" and args[0] not in self.app.config["bans"] and args[0] == self.app.config["spawnedby"]:
 			if args[1] == "!openbattle" and not self.hosted == 1:
 				if len(args) < 6:
 					print "Got invalid openbattle with params:"+" ".join(args)
