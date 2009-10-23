@@ -221,17 +221,17 @@ class Main:
 				if args[1] == "!forcespectatormode" and args[0] == self.battleowner:
 					s.send("FORCESPECTATORMODE "+" ".join(args[2:])+"\n")
 				if args[1] == "!redirectspring" and args[0] == self.battleowner and len(args) > 0:
-					if ( True ):
+					if ( self.users[self.battleowner].bot ):
 						self.redirectspring = bool(args[2])
 				if args[1] == "!redirectbattleroom" and args[0] == self.battleowner and len(args) > 0:
-					if ( True ):
+					if ( self.users[self.battleowner].bot ):
 						self.redirectbattleroom = bool(args[2])
 				if args[1] == "!cleanscript" and args[0] == self.battleowner:
 					self.script = ""
 				if args[1] == "!appendscriptline" and args[0] == self.battleowner:
 					if not len(self.script) > 200000:
 						self.script += " ".join(args[2:])+"\n"
-				if args[1].startswith("#") and args[0] == self.battleowner and True:
+				if args[1].startswith("#") and args[0] == self.battleowner and self.users[self.battleowner].bot:
 					try:
 						msg = " ".join(args[1:])
 						self.u.sayingame(msg[1:])
