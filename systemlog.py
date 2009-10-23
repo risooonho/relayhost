@@ -2,7 +2,10 @@ from colors import *
 from ParseConfig import *
 import time
 import datetime
+import os
+import sys
 class Main:
+	os.chdir(sys.path[0])
 	sock = 0
 	f = 0
 	def onload(self,tasc):

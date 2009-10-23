@@ -33,6 +33,7 @@ class Main:
 	bots = dict()
 	disabled = False
 	botstatus = dict()
+	os.chdir(sys.path[0])
 	def botthread(self,slot,nick,s,r,p,ist):
 		try:
 			logc(s,"Spawning (Requested by %s) " % r +nick)
