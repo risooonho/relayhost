@@ -42,7 +42,6 @@ class Main:
 	gamestarted = 0
 	redirectspring = False
 	redirectbattleroom = False
-	os.chdir(sys.path[0])
 	users = dict()
 	def ecb(self,event,data):
 		try:
