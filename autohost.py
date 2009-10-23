@@ -224,6 +224,15 @@ class Main:
 				if args[1] == "!appendscriptline" and args[0] == self.battleowner:
 					if not len(self.script) > 200000:
 						self.script += " ".join(args[2:])+"\n"
+				if args[1].startswith("#") and args[0] == self.battleowner and True:
+					try:
+						msg = args[1:]
+						self.u.sayingame(msg[1:])
+					except:
+						exc = traceback.format_exception(sys.exc_info()[0],sys.exc_info()[1],sys.exc_info()[2])
+						loge(socket,"*** EXCEPTION: BEGIN")
+						for line in exc:
+							loge(self.sock,line)
 				if args[1] == "!startgame" and args[0] == self.battleowner:
 					if not self.gamestarted == 1:
 						s.send("MYSTATUS 1\n")
