@@ -159,6 +159,8 @@ class Main:
 			self.users.update([(args[0],0)])
 		if command == "CLIENTSTATUS" and len(args) > 1:
 			self.users.update([(args[0],int(args[1]))])
+		if command == "RING" and len(args) > 0:
+			s.send("RING " + self.app.config["spawnedby"] + "\n")
 		if command == "SAIDPRIVATE" and args[0] not in self.app.config["bans"] and args[0] == self.app.config["spawnedby"]:
 			if args[1] == "!openbattle" and not self.hosted == 1:
 				if len(args) < 6:
