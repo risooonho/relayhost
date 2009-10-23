@@ -40,6 +40,8 @@ class Main:
 	app = 0
 	hosttime = 0.0
 	gamestarted = 0
+	redirectspring = False
+	redirectbattleroom = False
 	users = dict()
 	def ecb(self,event,data):
 		try:
@@ -175,7 +177,7 @@ class Main:
 			elif args[1] == "!openbattle" and self.hosted == 1:
 				pm(s,args[0],"E1 | Battle is already hosted")
 				return
-			if self.hosted == 1 and not self.gamestarted == 1:
+			if self.hosted == 1:
 				if args[1] == "!addstartrect" and self.hosted == 1:
 					s.send("ADDSTARTRECT "+" ".join(args[2:])+"\n")
 				if args[1] == "!setscripttags" and self.hosted == 1:
@@ -211,38 +213,47 @@ class Main:
 					s.send("RING "+" ".join(args[2:])+"\n")
 				if args[1] == "!forcespectatormode" and args[0] == self.battleowner:
 					s.send("FORCESPECTATORMODE "+" ".join(args[2:])+"\n")
+				if args[1] == "!redirectspring" and args[0] == self.battleowner and len(args) > 0:
+					if ( True ):
+						self.redirectspring = bool(args[2])
+				if args[1] == "!redirectbattleroom" and args[0] == self.battleowner and len(args) > 0:
+					if ( True ):
+						self.redirectbattleroom = bool(args[2])
 				if args[1] == "!cleanscript" and args[0] == self.battleowner:
 					self.script = ""
 				if args[1] == "!appendscriptline" and args[0] == self.battleowner:
 					if not len(self.script) > 200000:
 						self.script += " ".join(args[2:])+"\n"
 				if args[1] == "!startgame" and args[0] == self.battleowner:
-					s.send("MYSTATUS 1\n")
-					g = time.time()
-					try:
-						os.remove(os.path.join(os.environ['HOME'],"%f.txt" % g))
-					except:
-						pass
-					f = open(os.path.join(os.environ['HOME'],"%f.txt" % g),"aw")
-					s1 = self.script.find("MyPlayerNum=")
-					s2 = self.script[s1:].find(";")+1+s1
-					print s1
-					print s2
-					if s1 < 0:
-						#loge(s,"*** WARNING : MyPlayerNum not found!")
-						s1 = 0
-						s2 = len(self.script)-1
-					else:					
-						self.script = self.script.replace(self.script[s1:s2],"MyPlayerNum=0;")
-					s1 = self.script.find("MyPlayerName=")
-					s2 = self.script[s1:].find(";")+1+s1
-					print s1
-					print s2
-					self.script = self.script.replace(self.script[s1:s2],"MyPlayerName=%s;\nAutoHostPort=%i;" % (self.app.config["nick"],int(self.app.config["ahport"])))
-					f.write(self.script)
-					f.close()
+					if not self.gamestarted == 1:
+						s.send("MYSTATUS 1\n")
+						g = time.time()
+						try:
+							os.remove(os.path.join(os.environ['HOME'],"%f.txt" % g))
+						except:
+							pass
+						f = open(os.path.join(os.environ['HOME'],"%f.txt" % g),"aw")
+						s1 = self.script.find("MyPlayerNum=")
+						s2 = self.script[s1:].find(";")+1+s1
+						print s1
+						print s2
+						if s1 < 0:
+							#loge(s,"*** WARNING : MyPlayerNum not found!")
+							s1 = 0
+							s2 = len(self.script)-1
+						else:					
+							self.script = self.script.replace(self.script[s1:s2],"MyPlayerNum=0;")
+						s1 = self.script.find("MyPlayerName=")
+						s2 = self.script[s1:].find(";")+1+s1
+						print s1
+						print s2
+						self.script = self.script.replace(self.script[s1:s2],"MyPlayerName=%s;\nAutoHostPort=%i;" % (self.app.config["nick"],int(self.app.config["ahport"])))
+						f.write(self.script)
+						f.close()
 					
-					thread.start_new_thread(self.startspring,(s,g))
+						thread.start_new_thread(self.startspring,(s,g))
+					else:
+						pm(s,args[0],"E3 | Battle already started")
 			else:
 				pm(s,args[0],"E2 | Battle is not hosted")
 			
