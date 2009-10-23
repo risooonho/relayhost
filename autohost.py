@@ -165,11 +165,11 @@ class Main:
 		if command == "RING" and len(args) > 0:
 			s.send("RING " + self.app.config["spawnedby"] + "\n")
 		if command == "CLIENTBATTLESTATUS" and len(args) > 0 and self.redirectbattleroom:
-			s.send("SAYPRIVATE " + self.app.config["spawnedby"] + " !" + command + " " + " ".join(args[0:]) + "\n")
+			pm(s,self.app.config["spawnedby"], "!" + command + " " + " ".join(args[0:]) )
 		if command == "SAIDBATTLE" and len(args) > 0 and self.redirectbattleroom:
-			s.send("SAYPRIVATE " + self.app.config["spawnedby"] + " !" + command + " " + " ".join(args[0:]) + "\n")			
+			pm(s,self.app.config["spawnedby"], "!" + command + " " + " ".join(args[0:]))			
 		if command == "SAIDBATTLEEX" and len(args) > 0 and self.redirectbattleroom:
-			s.send("SAYPRIVATE " + self.app.config["spawnedby"] + " !" + command + " " + " ".join(args[0:]) + "\n")
+			pm(s,self.app.config["spawnedby"], "!" + command + " " + " ".join(args[0:]))
 		if command == "SAIDPRIVATE" and args[0] not in self.app.config["bans"] and args[0] == self.app.config["spawnedby"]:
 			if args[1] == "!openbattle" and not self.hosted == 1:
 				if len(args) < 6:
