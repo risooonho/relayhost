@@ -45,23 +45,16 @@ class Main:
 	redirectbattleroom = False
 	users = dict()
 	def ecb(self,event,data):
-		try:
-			if getbot(self.users[self.battleowner]) == 1:
-				ags = []
-				data2 = ""
-				for c in data:
-					if ord(c) < 17:
-						ags.append(ord(c))
-					else:
-						data2 += c
-				
-				pm(self.sock,self.battleowner,"#"+str(event)+"#".join(ags)+" "+data2)
-		except:
-			exc = traceback.format_exception(sys.exc_info()[0],sys.exc_info()[1],sys.exc_info()[2])
-			loge(socket,"*** EXCEPTION: BEGIN")
-			for line in exc:
-				loge(self.sock,line)
-			loge(socket,"*** EXCEPTION: END")
+		if self.redirectspring:
+			ags = []
+			data2 = ""
+			for c in data:
+				if ord(c) < 17:
+					ags.append(ord(c))
+				else:
+					data2 += c
+			
+			pm(self.sock,self.battleowner,"#"+str(event)+"#".join(ags)+" "+data2)
 	def gs(self):# Game started
 		self.gamestarted = 1
 	def onloggedin(self,socket):
@@ -221,11 +214,25 @@ class Main:
 				if args[1] == "!forcespectatormode" and args[0] == self.battleowner:
 					s.send("FORCESPECTATORMODE "+" ".join(args[2:])+"\n")
 				if args[1] == "!redirectspring" and args[0] == self.battleowner and len(args) > 1:
-					if ( self.users[self.battleowner].bot ):
-						self.redirectspring = bool(args[2])
+					try:
+						if ( self.users[self.battleowner].bot ):
+							self.redirectspring = bool(args[2])
+					except:
+						exc = traceback.format_exception(sys.exc_info()[0],sys.exc_info()[1],sys.exc_info()[2])
+						loge(socket,"*** EXCEPTION: BEGIN")
+						for line in exc:
+							loge(self.sock,line)
+						loge(socket,"*** EXCEPTION: END")
 				if args[1] == "!redirectbattleroom" and args[0] == self.battleowner and len(args) > 1:
-					if ( self.users[self.battleowner].bot ):
-						self.redirectbattleroom = bool(args[2])
+					try:
+						if ( self.users[self.battleowner].bot ):
+							self.redirectbattleroom = bool(args[2])
+					except:
+						exc = traceback.format_exception(sys.exc_info()[0],sys.exc_info()[1],sys.exc_info()[2])
+						loge(socket,"*** EXCEPTION: BEGIN")
+						for line in exc:
+							loge(self.sock,line)
+						loge(socket,"*** EXCEPTION: END")
 				if args[1] == "!cleanscript" and args[0] == self.battleowner:
 					self.script = ""
 				if args[1] == "!appendscriptline" and args[0] == self.battleowner:
