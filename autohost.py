@@ -63,7 +63,6 @@ class Main:
 		self.gamestarted = 1
 	def onloggedin(self,socket):
 		self.hosted = 0
-		self.users = dict()
 		self.sock = socket
 	def mscb(self,p,msg):
 		try:
@@ -170,10 +169,6 @@ class Main:
 	def oncommandfromserver(self,command,args,s):
 		#print "From server: %s | Args : %s" % (command,str(args))
 		self.sock = s
-		if command == "ADDUSER" and len(args) > 0:
-			self.users.update([(args[0],0)])
-		if command == "CLIENTSTATUS" and len(args) > 1:
-			self.users.update([(args[0],int(args[1]))])
 		if command == "RING" and len(args) > 0:
 			s.send("RING " + self.app.config["spawnedby"] + "\n")
 		if command == "CLIENTBATTLESTATUS" and len(args) > 0 and self.redirectbattleroom:
@@ -234,7 +229,7 @@ class Main:
 					s.send("FORCESPECTATORMODE "+" ".join(args[2:])+"\n")
 				if args[1] == "!redirectspring" and args[0] == self.battleowner and len(args) > 1:
 					try:
-						if ( self.users[self.battleowner].bot ):
+						if ( self.tsc.users[self.battleowner].bot ):
 							self.redirectspring = bool(args[2])
 					except:
 						exc = traceback.format_exception(sys.exc_info()[0],sys.exc_info()[1],sys.exc_info()[2])
@@ -244,7 +239,7 @@ class Main:
 						loge(socket,"*** EXCEPTION: END")
 				if args[1] == "!redirectbattleroom" and args[0] == self.battleowner and len(args) > 1:
 					try:
-						if ( self.users[self.battleowner].bot ):
+						if ( self.tsc.users[self.battleowner].bot ):
 							self.redirectbattleroom = bool(args[2])
 					except:
 						exc = traceback.format_exception(sys.exc_info()[0],sys.exc_info()[1],sys.exc_info()[2])
@@ -257,7 +252,7 @@ class Main:
 				if args[1] == "!appendscriptline" and args[0] == self.battleowner:
 					if not len(self.script) > 200000:
 						self.script += " ".join(args[2:])+"\n"
-				if args[1].startswith("#") and args[0] == self.battleowner and self.users[self.battleowner].bot:
+				if args[1].startswith("#") and args[0] == self.battleowner and self.tsc.users[self.battleowner].bot:
 					try:
 						msg = " ".join(args[1:])
 						self.u.sayingame(msg[1:])
