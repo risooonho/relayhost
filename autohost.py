@@ -12,7 +12,7 @@ import traceback
 import platform
 import sys
 if platform.system() == "Windows":
-  import win32api
+	import win32api
 from utilities import *
 def pm(s,p,m):
 	try:
@@ -77,17 +77,20 @@ class Main:
 				loge(self.sock,line)
 			loge(socket,"*** EXCEPTION: END")
 		
+	def killbot(self):
+		self.socket.close()
+		if platform.system() == "Windows":
+			handle = win32api.OpenProcess(1, 0, os.getpid())
+			win32api.TerminateProcess(handle, 0)
+		else:
+			os.kill(os.getpid(),signal.SIGKILL)
 	def timeoutthread(self):
 		while 1:
 			time.sleep(20.0)
 			try:
 				if not ( not self.noowner and self.hosted == 1) and not self.ingame == 1:
 					print "Timeouted hosting"
-					if platform.system() == "Windows":
-					  handle = win32api.OpenProcess(1, 0, os.getpid())
-					  win32api.TerminateProcess(handle, 0)
-					else:
-					  os.kill(os.getpid(),signal.SIGKILL)
+					self.killbot()
 			except:
 				pass
 			
@@ -107,12 +110,12 @@ class Main:
 			st = time.time()
 			#status,j = commands.getstatusoutput("spring-dedicated "+os.path.join(os.environ['HOME'],"%f.txt" % g ))
 			if platform.system() == "Linux":
-			  loge(socket,"*** Starting spring: command line \"%s\"" % (self.app.config["springdedpath"]+" "+os.path.join(os.environ['HOME'],"%f.txt" % g )))
-			  self.pr = subprocess.Popen((self.app.config["springdedpath"],os.path.join(os.environ['HOME'],"%f.txt" % g )),stdout=subprocess.PIPE,stderr=subprocess.STDOUT)
+				loge(socket,"*** Starting spring: command line \"%s\"" % (self.app.config["springdedpath"]+" "+os.path.join(os.environ['HOME'],"%f.txt" % g )))
+				self.pr = subprocess.Popen((self.app.config["springdedpath"],os.path.join(os.environ['HOME'],"%f.txt" % g )),stdout=subprocess.PIPE,stderr=subprocess.STDOUT)
 			else:
-			  loge(socket,"*** Starting spring: command line \"%s\"" % (self.app.config["springdedpath"]+" "+os.path.join(os.environ['USERPROFILE'],"%f.txt" % g )))
-			  os.chdir("\\".join(self.app.config["springdedpath"].replace("/","\\").split("\\")[:self.app.config["springdedpath"].replace("/","\\").count("\\")]))
-			  self.pr = subprocess.Popen((self.app.config["springdedpath"],os.path.join(os.environ['USERPROFILE'],"%f.txt" % g )),stdout=subprocess.PIPE,stderr=subprocess.STDOUT)
+				loge(socket,"*** Starting spring: command line \"%s\"" % (self.app.config["springdedpath"]+" "+os.path.join(os.environ['USERPROFILE'],"%f.txt" % g )))
+				os.chdir("\\".join(self.app.config["springdedpath"].replace("/","\\").split("\\")[:self.app.config["springdedpath"].replace("/","\\").count("\\")]))
+				self.pr = subprocess.Popen((self.app.config["springdedpath"],os.path.join(os.environ['USERPROFILE'],"%f.txt" % g )),stdout=subprocess.PIPE,stderr=subprocess.STDOUT)
 			l = self.pr.stdout.readline()
 			while len(l) > 0:
 				self.output += l
@@ -148,11 +151,7 @@ class Main:
 		if self.noowner == True:
 			loge(socket,"The host is no longer in the battle, exiting")
 			print "Exiting"
-			if platform.system() == "Windows":
-			  handle = win32api.OpenProcess(1, 0, os.getpid())
-			  win32api.TerminateProcess(handle, 0)
-			else:
-			  os.kill(os.getpid(),signal.SIGKILL)
+			self.killbot()
 	def onload(self,tasc):
 		try:
 			self.app = tasc.main
@@ -311,41 +310,33 @@ class Main:
 		if command == "SERVERMSG":
 			pm(s,self.battleowner," ".join(args))
 		if command == "LEFTBATTLE" and int(args[0]) == self.battleid and args[1] == self.battleowner:
-			if  not self.gamestarted == 1:
+			if	not self.gamestarted == 1:
 				loge(s,"The host has left the battle and the game isn't running, exiting")
 				s.send("LEAVEBATTLE\n")
 				try:
-				  if platform.system() == "Windows":
-				    handle = win32api.OpenProcess(1, 0, self.pr.pid)
-				    win32api.TerminateProcess(handle, 0)
-				  else:
-				    os.kill(self.pr.pid,signal.SIGKILL)
+					if platform.system() == "Windows":
+						handle = win32api.OpenProcess(1, 0, self.pr.pid)
+						win32api.TerminateProcess(handle, 0)
+					else:
+						os.kill(self.pr.pid,signal.SIGKILL)
 				except:
 					pass
-				if platform.system() == "Windows":
-				  handle = win32api.OpenProcess(1, 0, os.getpid())
-				  win32api.TerminateProcess(handle, 0)
-				else:
-				  os.kill(os.getpid(),signal.SIGKILL)
+				self.killbot()
 				
 			self.noowner = True
 			
 		if command == "REMOVEUSER" and args[0] == self.battleowner:
-			if  not self.gamestarted == 1:
+			if	not self.gamestarted == 1:
 				loge(s,"The host disconnected and game not started, exiting")
 				try:
-				  if platform.system() == "Windows":
-				    handle = win32api.OpenProcess(1, 0, self.pr.pid)
-				    win32api.TerminateProcess(handle, 0)
-				  else:
-				    os.kill(self.pr.pid,signal.SIGKILL)
+					if platform.system() == "Windows":
+						handle = win32api.OpenProcess(1, 0, self.pr.pid)
+						win32api.TerminateProcess(handle, 0)
+					else:
+						os.kill(self.pr.pid,signal.SIGKILL)
 				except:
 					pass
-				if platform.system() == "Windows":
-				  handle = win32api.OpenProcess(1, 0, os.getpid())
-				  win32api.TerminateProcess(handle, 0)
-				else:
-				  os.kill(os.getpid(),signal.SIGKILL)
+				self.killbot()
 			self.noowner = True
 			
 	def onloggedin(self,socket):
