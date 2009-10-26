@@ -154,6 +154,7 @@ class Main:
 			self.killbot()
 	def onload(self,tasc):
 		try:
+			self.tsc = tasc
 			self.app = tasc.main
 			self.hosttime = time.time()
 			thread.start_new_thread(self.timeoutthread,())
