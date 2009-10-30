@@ -111,14 +111,16 @@ class Main:
 			socket.send("SAYBATTLEEX *** Starting game...\n")
 			socket.send("MYSTATUS 1\n")
 			st = time.time()
-			#status,j = commands.getstatusoutput("spring-dedicated "+os.path.join(os.environ['HOME'],"%f.txt" % g ))
-			if platform.system() == "Linux":
-				loge(socket,"*** Starting spring: command line \"%s\"" % (self.app.config["springdedpath"]+" "+os.path.join(os.environ['HOME'],"%f.txt" % g )))
-				self.pr = subprocess.Popen((self.app.config["springdedpath"],os.path.join(os.environ['HOME'],"%f.txt" % g )),stdout=subprocess.PIPE,stderr=subprocess.STDOUT)
+			#status,j = commands.getstatusoutput("spring-dedicated "+os.path.join(scriptbasepath,"%f.txt" % g ))
+			loge(socket,"*** Starting spring: command line \"%s\"" % (self.app.config["springdedpath"]+" "+os.path.join(scriptbasepath,"%f.txt" % g )))
+			
+				
+			self.pr = subprocess.Popen((self.app.config["springdedpath"],os.path.join(scriptbasepath,"%f.txt" % g )),stdout=subprocess.PIPE,stderr=subprocess.STDOUT)
+			if platform.system() == "Windows":
+				dedpath = "\\".join(self.app.config["springdedpath"].replace("/","\\").split("\\")[:self.app.config["springdedpath"].replace("/","\\").count("\\")])
 			else:
-				loge(socket,"*** Starting spring: command line \"%s\"" % (self.app.config["springdedpath"]+" "+os.path.join(os.environ['USERPROFILE'],"%f.txt" % g )))
-				os.chdir("\\".join(self.app.config["springdedpath"].replace("/","\\").split("\\")[:self.app.config["springdedpath"].replace("/","\\").count("\\")]))
-				self.pr = subprocess.Popen((self.app.config["springdedpath"],os.path.join(os.environ['USERPROFILE'],"%f.txt" % g )),stdout=subprocess.PIPE,stderr=subprocess.STDOUT)
+				dedpath = None
+			self.pr = subprocess.Popen((self.app.config["springdedpath"],os.path.join(scriptbasepath,"%f.txt" % g )),stdout=subprocess.PIPE,stderr=subprocess.STDOUT,cwd=dedpath)
 			l = self.pr.stdout.readline()
 			while len(l) > 0:
 				self.output += l
@@ -276,10 +278,7 @@ class Main:
 							os.remove(os.path.join(self.scriptbasepath,"%f.txt" % g))
 						except:
 							pass
-						if platform.system() == "Linux":
-							f = open(os.path.join(os.environ['HOME'],"%f.txt" % g),"a")
-						else:
-							f = open(os.path.join(os.environ['USERPROFILE'],"%f.txt" % g),"a")
+						f = open(os.path.join(scriptbasepath,"%f.txt" % g),"a")
 						s1 = self.script.find("MyPlayerNum=")
 						s2 = self.script[s1:].find(";")+1+s1
 						print s1
