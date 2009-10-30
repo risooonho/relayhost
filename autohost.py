@@ -113,9 +113,6 @@ class Main:
 			st = time.time()
 			#status,j = commands.getstatusoutput("spring-dedicated "+os.path.join(scriptbasepath,"%f.txt" % g ))
 			loge(socket,"*** Starting spring: command line \"%s\"" % (self.app.config["springdedpath"]+" "+os.path.join(scriptbasepath,"%f.txt" % g )))
-			
-				
-			self.pr = subprocess.Popen((self.app.config["springdedpath"],os.path.join(scriptbasepath,"%f.txt" % g )),stdout=subprocess.PIPE,stderr=subprocess.STDOUT)
 			if platform.system() == "Windows":
 				dedpath = "\\".join(self.app.config["springdedpath"].replace("/","\\").split("\\")[:self.app.config["springdedpath"].replace("/","\\").count("\\")])
 			else:
