@@ -44,7 +44,10 @@ class Main:
 	app = 0
 	hosttime = 0.0
 	gamestarted = 0
-	scriptbasepath = os.environ['HOME']
+	if platform.system() == "Windows":
+		scriptbasepath = os.environ['USERPROFILE']
+	else:
+		scriptbasepath = os.environ['HOME']
 	redirectspring = False
 	redirectbattleroom = False
 	users = dict()
