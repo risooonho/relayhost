@@ -111,13 +111,13 @@ class Main:
 			socket.send("SAYBATTLEEX *** Starting game...\n")
 			socket.send("MYSTATUS 1\n")
 			st = time.time()
-			#status,j = commands.getstatusoutput("spring-dedicated "+os.path.join(scriptbasepath,"%f.txt" % g ))
-			loge(socket,"*** Starting spring: command line \"%s\"" % (self.app.config["springdedpath"]+" "+os.path.join(scriptbasepath,"%f.txt" % g )))
+			#status,j = commands.getstatusoutput("spring-dedicated "+os.path.join(self.scriptbasepath,"%f.txt" % g ))
+			loge(socket,"*** Starting spring: command line \"%s\"" % (self.app.config["springdedpath"]+" "+os.path.join(self.scriptbasepath,"%f.txt" % g )))
 			if platform.system() == "Windows":
 				dedpath = "\\".join(self.app.config["springdedpath"].replace("/","\\").split("\\")[:self.app.config["springdedpath"].replace("/","\\").count("\\")])
 			else:
 				dedpath = None
-			self.pr = subprocess.Popen((self.app.config["springdedpath"],os.path.join(scriptbasepath,"%f.txt" % g )),stdout=subprocess.PIPE,stderr=subprocess.STDOUT,cwd=dedpath)
+			self.pr = subprocess.Popen((self.app.config["springdedpath"],os.path.join(self.scriptbasepath,"%f.txt" % g )),stdout=subprocess.PIPE,stderr=subprocess.STDOUT,cwd=dedpath)
 			l = self.pr.stdout.readline()
 			while len(l) > 0:
 				self.output += l
@@ -275,7 +275,7 @@ class Main:
 							os.remove(os.path.join(self.scriptbasepath,"%f.txt" % g))
 						except:
 							pass
-						f = open(os.path.join(scriptbasepath,"%f.txt" % g),"a")
+						f = open(os.path.join(self.scriptbasepath,"%f.txt" % g),"a")
 						s1 = self.script.find("MyPlayerNum=")
 						s2 = self.script[s1:].find(";")+1+s1
 						print s1
