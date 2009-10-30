@@ -81,7 +81,6 @@ class Main:
 			loge(socket,"*** EXCEPTION: END")
 		
 	def killbot(self):
-		self.socket.close()
 		if platform.system() == "Windows":
 			handle = win32api.OpenProcess(1, 0, os.getpid())
 			win32api.TerminateProcess(handle, 0)
