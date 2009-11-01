@@ -20,7 +20,7 @@ class UDPint:
 				data, address = self.s.recvfrom(8192)
 				self.addr = address
 				event = ord(data[0])
-				print "Received event %i from %s" % (event,str(address))
+				#print "Received event %i from %s" % (event,str(address))
 				if event == 10:
 					n = ord(data[1])
 					name = data[2:]
@@ -38,7 +38,7 @@ class UDPint:
 				traceback.print_exc(file=sys.stdout)
 				print '-'*60
 	def sayingame(self,text):
-		print "Sending %s to spring" % text
+		#print "Sending %s to spring" % text
 		try:
 			self.s.sendto(text,self.addr)
 		except:
