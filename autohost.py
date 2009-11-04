@@ -120,6 +120,7 @@ class Main:
 				springdatapath = self.app.config["springdatapath"]
 				if not springdatapath in sys.path:
 					sys.path.append(springdatapath)
+				os.chdir(springdatapath)
 			else:
 				springdatapath = None
 			self.pr = subprocess.Popen((self.app.config["springdedpath"],os.path.join(self.scriptbasepath,"%f.txt" % g )),stdout=subprocess.PIPE,stderr=subprocess.STDOUT,cwd=springdatapath)
