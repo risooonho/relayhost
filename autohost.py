@@ -116,9 +116,13 @@ class Main:
 				dedpath = "\\".join(self.app.config["springdedpath"].replace("/","\\").split("\\")[:self.app.config["springdedpath"].replace("/","\\").count("\\")])
 				if not dedpath in sys.path:
 					sys.path.append(dedpath)
+			if "springdatapath" in self.app.config:
+				springdatapath = self.app.config["springdatapath"]
+				if not springdatapath in sys.path:
+					sys.path.append(springdatapath)
 			else:
-				dedpath = None
-			self.pr = subprocess.Popen((self.app.config["springdedpath"],os.path.join(self.scriptbasepath,"%f.txt" % g )),stdout=subprocess.PIPE,stderr=subprocess.STDOUT,cwd=dedpath)
+				springdatapath = None
+			self.pr = subprocess.Popen((self.app.config["springdedpath"],os.path.join(self.scriptbasepath,"%f.txt" % g )),stdout=subprocess.PIPE,stderr=subprocess.STDOUT,cwd=springdatapath)
 			l = self.pr.stdout.readline()
 			while len(l) > 0:
 				self.output += l

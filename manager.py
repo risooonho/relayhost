@@ -45,6 +45,8 @@ class Main:
 			d.update([("spawnedby",r)])
 			d.update([("serverport",self.app.config["serverport"])])
 			d.update([("springdedpath",self.app.config["springdedpath"])])
+			if "springdatapath" in self.app.config:
+				d.update([("springdatapath",self.app.config["springdatapath"])])
 			d.update([("admins",self.app.config["admins"])])
 			d.update([("nick",nick)])
 			d.update([("password",p)])
