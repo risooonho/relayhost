@@ -118,6 +118,8 @@ class Main:
 					sys.path.append(dedpath)
 			else:
 				dedpath = None
+			print sys.path
+			print dedpath
 			self.pr = subprocess.Popen((self.app.config["springdedpath"],os.path.join(self.scriptbasepath,"%f.txt" % g )),stdout=subprocess.PIPE,stderr=subprocess.STDOUT,cwd=dedpath)
 			l = self.pr.stdout.readline()
 			while len(l) > 0:
