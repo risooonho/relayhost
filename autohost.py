@@ -97,7 +97,7 @@ class Main:
 				pass
 			
 	def startspring(self,socket,g):
-		cwd = os.getcwd()
+		currentwworkingdir = os.getcwd()
 		try:
 			
 			self.gamestarted = 0
@@ -147,13 +147,13 @@ class Main:
 			for line in exc:
 				loge(socket,line)
 			loge(socket,"*** EXCEPTION: END")
-			os.chdir(cwd)
+			os.chdir(currentwworkingdir)
 		try:
 			if int(self.app.config["keepscript"]) == 0:
 				os.remove(os.path.join(self.scriptbasepath,"%f.txt" % g))
 		except:
 			pass
-		os.chdir(cwd)
+		os.chdir(currentwworkingdir)
 		self.ingame = 0
 		self.gamestarted = 0
 		if self.noowner == True:
