@@ -123,6 +123,8 @@ class Main:
 				os.chdir(springdatapath)
 			else:
 				springdatapath = None
+			if springdatapath!= None:
+				os.environ['SPRING_DATADIR'] = springdatapath
 			self.pr = subprocess.Popen((self.app.config["springdedpath"],os.path.join(self.scriptbasepath,"%f.txt" % g )),stdout=subprocess.PIPE,stderr=subprocess.STDOUT,cwd=springdatapath)
 			l = self.pr.stdout.readline()
 			while len(l) > 0:
@@ -182,7 +184,7 @@ class Main:
 		if command == "CLIENTBATTLESTATUS" and len(args) > 0 and self.redirectbattleroom:
 			pm(s,self.app.config["spawnedby"], "!" + command + " " + " ".join(args[0:]) )
 		if command == "SAIDBATTLE" and len(args) > 0 and self.redirectbattleroom:
-			pm(s,self.app.config["spawnedby"], "!" + command + " " + " ".join(args[0:]))			
+			pm(s,self.app.config["spawnedby"], "!" + command + " " + " ".join(args[0:]))
 		if command == "SAIDBATTLEEX" and len(args) > 0 and self.redirectbattleroom:
 			pm(s,self.app.config["spawnedby"], "!" + command + " " + " ".join(args[0:]))
 		if command == "SAIDPRIVATE" and args[0] not in self.app.config["bans"] and args[0] == self.app.config["spawnedby"]:
@@ -290,7 +292,7 @@ class Main:
 							#loge(s,"*** WARNING : MyPlayerNum not found!")
 							s1 = 0
 							s2 = len(self.script)-1
-						else:					
+						else:
 							self.script = self.script.replace(self.script[s1:s2],"MyPlayerNum=0;")
 						s1 = self.script.find("MyPlayerName=")
 						s2 = self.script[s1:].find(";")+1+s1
@@ -311,8 +313,8 @@ class Main:
 			self.used = 1
 			loge(s,"Battle hosted succesfully , id is %s" % args[0])
 		if command == "JOINEDBATTLE" and len(args) == 2 and int(args[0]) == self.battleid and args[1] == self.app.config["spawnedby"]:
-			self.hosted = 1 
-			loge(s,"The host has joined the battle")	
+			self.hosted = 1
+			loge(s,"The host has joined the battle")
 		if command == "SERVERMSG":
 			pm(s,self.battleowner," ".join(args))
 		if command == "LEFTBATTLE" and int(args[0]) == self.battleid and args[1] == self.battleowner:
@@ -347,6 +349,6 @@ class Main:
 			
 	def onloggedin(self,socket):
 		self.noowner = True
-		self.hosted = 0	
+		self.hosted = 0
 		if self.ingame == 1:
 			socket.send("MYSTATUS 1\n")
