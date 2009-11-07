@@ -27,7 +27,7 @@ def parseportrange(arg):
 	tempvariable = []
 	if ( arg.find( separator ) >= 0 ):
 		extremes = parselist(arg,separator)
-		for num in range( int(extremes[0]), int(extremes[1]) ):
+		for num in range( int(extremes[0]), int(extremes[1]) +1 ):
 			tempvariable.append(str(num))
 	else:
 		tempvariable.append(arg)
