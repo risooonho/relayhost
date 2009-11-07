@@ -9,6 +9,7 @@ import signal
 import traceback
 import subprocess
 import platform
+import time
 if platform.system() == "Windows":
   import win32api
 def logc(s,m):
@@ -60,8 +61,9 @@ class Main:
 			#print self.bots
 			p.wait()
 			logc(s,"Destroying "+nick)
-			self.ul.remove(r)
-			
+			if r in self.ul:
+			    self.ul.remove(r)
+
 			if ist.listfull:
 				ist.listfull = False
 				ist.updatestatus(s)
@@ -139,6 +141,16 @@ class Main:
 				self.app.config["bans"] = ','.join(self.bans)
 				self.app.SaveConfig()
 				socket.send("SAYPRIVATE %s %s\n" % (args[0],"Done."))
+			elif command == "SAIDPRIVATE" and len(args) == 2 and args[1] == "!registerall" and args[0] in self.app.admins:
+				for b in self.botstatus:
+					if not self.botstatus[b]:
+						slot = b
+						self.threads.append(thread.start_new_thread(self.botthread,(slot,self.an[slot],socket,args[0],self.ap,self)))
+						self.botstatus[slot] = True
+						time.sleep(1)
+						if b + 1 == len(self.botstatus): # The bot spawned was the last one
+							self.listfull = True
+							socket.send("MYSTATUS 1\n")
 			elif command == "SAIDPRIVATE" and len(args) == 2 and args[1] == "!spawn" and args[0] not in self.ul and not self.disabled:
 				if args[0] in self.bans:
 					socket.send("SAYPRIVATE %s %s\n" %(args[0],"\001 Error: You are banned!"))
@@ -182,6 +194,6 @@ class Main:
 				loge(socket,line)
 			loge(socket,"*** EXCEPTION: END")
 	def updatestatus(self,socket):
-		socket.send("MYSTATUS %i\n" % int(int(self.listfull)+int(self.disabled)*2))	
+		socket.send("MYSTATUS %i\n" % int(int(self.listfull)+int(self.disabled)*2))
 	def onloggedin(self,socket):
-		self.updatestatus(socket)	
+		self.updatestatus(socket)
