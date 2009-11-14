@@ -60,7 +60,7 @@ class Main:
 					ags.append(ord(c))
 				else:
 					data2 += c
-			
+
 			pm(self.sock,self.battleowner,"#"+str(event)+"#".join(ags)+" "+data2)
 	def gs(self):# Game started
 		self.gamestarted = 1
@@ -79,7 +79,7 @@ class Main:
 			for line in exc:
 				loge(self.sock,line)
 			loge(socket,"*** EXCEPTION: END")
-		
+
 	def killbot(self):
 		if platform.system() == "Windows":
 			handle = win32api.OpenProcess(1, 0, os.getpid())
@@ -95,11 +95,11 @@ class Main:
 					self.killbot()
 			except:
 				pass
-			
+
 	def startspring(self,socket,g):
 		currentwworkingdir = os.getcwd()
 		try:
-			
+
 			self.gamestarted = 0
 			self.u.reset()
 			if self.ingame == 1:
@@ -133,8 +133,8 @@ class Main:
 			status = self.pr.wait()
 			loge(socket,"*** Spring has exited with status %i" % status )
 			et = time.time()
-		
-			
+
+
 			if status != 0:
 				socket.send("SAYBATTLEEX *** Error: Spring Exited with status %i\n" % status)
 				g = self.output.split("\n")
@@ -171,11 +171,11 @@ class Main:
 			self.u = udpinterface.UDPint(int(self.app.config["ahport"]),self.mscb,self.gs,self.ecb)
 		except:
 			exc = traceback.format_exception(sys.exc_info()[0],sys.exc_info()[1],sys.exc_info()[2])
-			
-			
+
+
 			for line in exc:
 				print line
-			
+
 	def oncommandfromserver(self,command,args,s):
 		#print "From server: %s | Args : %s" % (command,str(args))
 		self.sock = s
@@ -187,6 +187,8 @@ class Main:
 			pm(s,self.app.config["spawnedby"], "!" + command + " " + " ".join(args[0:]))
 		if command == "SAIDBATTLEEX" and len(args) > 0 and self.redirectbattleroom:
 			pm(s,self.app.config["spawnedby"], "!" + command + " " + " ".join(args[0:]))
+		if command == "REQUESTBATTLESTATUS":
+			s.send( "MYBATTLESTATUS 4194816 255\n" )#spectator+synced/white
 		if command == "SAIDPRIVATE" and args[0] not in self.app.config["bans"] and args[0] == self.app.config["spawnedby"]:
 			if args[1] == "!openbattle" and not self.hosted == 1:
 				if len(args) < 6:
@@ -306,9 +308,9 @@ class Main:
 						pm(s,args[0],"E3 | Battle already started")
 			else:
 				pm(s,args[0],"E2 | Battle is not hosted")
-			
+
 		if command == "OPENBATTLE":
-			
+
 			self.battleid = int(args[0])
 			self.used = 1
 			loge(s,"Battle hosted succesfully , id is %s" % args[0])
@@ -330,9 +332,9 @@ class Main:
 				except:
 					pass
 				self.killbot()
-				
+
 			self.noowner = True
-			
+
 		if command == "REMOVEUSER" and args[0] == self.battleowner:
 			if	not self.gamestarted == 1:
 				loge(s,"The host disconnected and game not started, exiting")
@@ -346,7 +348,7 @@ class Main:
 					pass
 				self.killbot()
 			self.noowner = True
-			
+
 	def onloggedin(self,socket):
 		self.noowner = True
 		self.hosted = 0
