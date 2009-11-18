@@ -286,20 +286,8 @@ class Main:
 						except:
 							pass
 						f = open(os.path.join(self.scriptbasepath,"%f.txt" % g),"a")
-						s1 = self.script.find("MyPlayerNum=")
-						s2 = self.script[s1:].find(";")+1+s1
-						print s1
-						print s2
-						if s1 < 0:
-							#loge(s,"*** WARNING : MyPlayerNum not found!")
-							s1 = 0
-							s2 = len(self.script)-1
-						else:
-							self.script = self.script.replace(self.script[s1:s2],"MyPlayerNum=0;")
 						s1 = self.script.find("MyPlayerName=")
 						s2 = self.script[s1:].find(";")+1+s1
-						print s1
-						print s2
 						self.script = self.script.replace(self.script[s1:s2],"MyPlayerName=%s;\nAutoHostPort=%i;" % (self.app.config["nick"],int(self.app.config["ahport"])))
 						f.write(self.script)
 						f.close()
