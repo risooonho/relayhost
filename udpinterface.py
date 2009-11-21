@@ -3,7 +3,7 @@ import thread
 import string
 import traceback,sys
 class UDPint:
-	def __init__(self,port,messagecb,startedcb,eventcb):
+	def __init__(self,port,messagecb,eventcb):
 		self.s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 		self.s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 		self.s.bind(("localhost",int(port)))
@@ -16,7 +16,7 @@ class UDPint:
 	def mainloop(self,messagecb,scb,eventcb):
 		while 1:
 			try:
-				
+
 				data, address = self.s.recvfrom(8192)
 				self.addr = address
 				event = ord(data[0])
@@ -30,8 +30,8 @@ class UDPint:
 					text = data[3:]
 					if not text.lower().startswith("a:"):
 						messagecb(self.players[n],text)
-				if event == 2:
-					scb()
+				if event == 30: #gameover
+					self.sayingame("/kills")
 				eventcb(ord(data[0]),data[1:])
 			except:
 				print '-'*60

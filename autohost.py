@@ -39,11 +39,10 @@ class Main:
 	pr = 0
 	noowner = True
 	script = ""
-	ingame = 0
 	used = 0
 	app = 0
 	hosttime = 0.0
-	gamestarted = 0
+	gamestarted = False
 	if platform.system() == "Windows":
 		scriptbasepath = os.environ['USERPROFILE']
 	else:
@@ -62,8 +61,6 @@ class Main:
 					data2 += c
 
 			pm(self.sock,self.battleowner,"#"+str(event)+"#".join(ags)+" "+data2)
-	def gs(self):# Game started
-		self.gamestarted = 1
 	def onloggedin(self,socket):
 		self.hosted = 0
 		self.sock = socket
@@ -90,7 +87,7 @@ class Main:
 		while 1:
 			time.sleep(20.0)
 			try:
-				if not ( not self.noowner and self.hosted == 1) and not self.ingame == 1:
+				if not ( not self.noowner and self.hosted == 1) and not self.gamestarted:
 					print "Timeouted hosting"
 					self.killbot()
 			except:
@@ -99,14 +96,11 @@ class Main:
 	def startspring(self,socket,g):
 		currentwworkingdir = os.getcwd()
 		try:
-
-			self.gamestarted = 0
 			self.u.reset()
-			if self.ingame == 1:
+			if self.gamestarted:
 				socket.send("SAYBATTLEEX *** Error: game is already running\n")
 				return
 			self.output = ""
-			self.ingame = 1
 			socket.send("SAYBATTLEEX *** Starting game...\n")
 			socket.send("MYSTATUS 1\n")
 			st = time.time()
@@ -126,6 +120,7 @@ class Main:
 			if springdatapath!= None:
 				os.environ['SPRING_DATADIR'] = springdatapath
 			self.pr = subprocess.Popen((self.app.config["springdedpath"],os.path.join(self.scriptbasepath,"%f.txt" % g )),stdout=subprocess.PIPE,stderr=subprocess.STDOUT,cwd=springdatapath)
+			self.gamestarted = True
 			l = self.pr.stdout.readline()
 			while len(l) > 0:
 				self.output += l
@@ -150,14 +145,14 @@ class Main:
 				loge(socket,line)
 			loge(socket,"*** EXCEPTION: END")
 			os.chdir(currentwworkingdir)
+			self.gamestarted = False
 		try:
 			if int(self.app.config["keepscript"]) == 0:
 				os.remove(os.path.join(self.scriptbasepath,"%f.txt" % g))
 		except:
 			pass
 		os.chdir(currentwworkingdir)
-		self.ingame = 0
-		self.gamestarted = 0
+		self.gamestarted = False
 		if self.noowner == True:
 			loge(socket,"The host is no longer in the battle, exiting")
 			print "Exiting"
@@ -168,7 +163,7 @@ class Main:
 			self.app = tasc.main
 			self.hosttime = time.time()
 			thread.start_new_thread(self.timeoutthread,())
-			self.u = udpinterface.UDPint(int(self.app.config["ahport"]),self.mscb,self.gs,self.ecb)
+			self.u = udpinterface.UDPint(int(self.app.config["ahport"]),self.mscb,self.ecb)
 		except:
 			exc = traceback.format_exception(sys.exc_info()[0],sys.exc_info()[1],sys.exc_info()[2])
 
@@ -278,7 +273,7 @@ class Main:
 				if args[1] == "!saybattleex" and args[0] == self.battleowner:
 					s.send("SAYBATTLEEX "+" ".join(args[2:])+"\n")
 				if args[1] == "!startgame" and args[0] == self.battleowner:
-					if not self.gamestarted == 1:
+					if not self.gamestarted:
 						s.send("MYSTATUS 1\n")
 						g = time.time()
 						try:
@@ -308,7 +303,7 @@ class Main:
 		if command == "SERVERMSG":
 			pm(s,self.battleowner," ".join(args))
 		if command == "LEFTBATTLE" and int(args[0]) == self.battleid and args[1] == self.battleowner:
-			if	not self.gamestarted == 1:
+			if	not self.gamestarted:
 				loge(s,"The host has left the battle and the game isn't running, exiting")
 				s.send("LEAVEBATTLE\n")
 				try:
@@ -324,7 +319,7 @@ class Main:
 			self.noowner = True
 
 		if command == "REMOVEUSER" and args[0] == self.battleowner:
-			if	not self.gamestarted == 1:
+			if	not self.gamestarted:
 				loge(s,"The host disconnected and game not started, exiting")
 				try:
 					if platform.system() == "Windows":
@@ -340,5 +335,5 @@ class Main:
 	def onloggedin(self,socket):
 		self.noowner = True
 		self.hosted = 0
-		if self.ingame == 1:
+		if self.gamestarted:
 			socket.send("MYSTATUS 1\n")
