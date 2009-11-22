@@ -30,7 +30,7 @@ class UDPint:
 					text = data[3:]
 					if not text.lower().startswith("a:"):
 						messagecb(self.players[n],text)
-				if event == 30: #gameover
+				if event == 3: #gameover
 					self.sayingame("/kill")
 				eventcb(ord(data[0]),data[1:])
 			except:
