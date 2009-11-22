@@ -9,11 +9,11 @@ class UDPint:
 		self.s.bind(("localhost",int(port)))
 		self.players = dict()
 		self.addr = ""
-		thread.start_new_thread(self.mainloop,(messagecb,startedcb,eventcb))
+		thread.start_new_thread(self.mainloop,(messagecb,eventcb))
 		print "UDP Listening on port "+str(port)
 	def reset(self):
 		self.players = dict()
-	def mainloop(self,messagecb,scb,eventcb):
+	def mainloop(self,messagecb,eventcb):
 		while 1:
 			try:
 
@@ -31,7 +31,7 @@ class UDPint:
 					if not text.lower().startswith("a:"):
 						messagecb(self.players[n],text)
 				if event == 30: #gameover
-					self.sayingame("/kills")
+					self.sayingame("/kill")
 				eventcb(ord(data[0]),data[1:])
 			except:
 				print '-'*60

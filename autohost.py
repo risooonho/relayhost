@@ -59,7 +59,6 @@ class Main:
 					ags.append(ord(c))
 				else:
 					data2 += c
-
 			pm(self.sock,self.battleowner,"#"+str(event)+"#".join(ags)+" "+data2)
 	def onloggedin(self,socket):
 		self.hosted = 0
