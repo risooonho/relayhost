@@ -308,9 +308,9 @@ class Main:
 		if command == "JOINEDBATTLE" and len(args) == 2 and int(args[0]) == self.battleid and args[1] == self.app.config["spawnedby"]:
 			self.hosted = 1
 			loge(s,"The host has joined the battle")
-			socket.send("SAYBATTLE Hello, the bot accepts all commands from normal spring prefixed with ! instead of /\n")
-			socket.send("SAYBATTLE Read Documentation/cmds.txt for a list of spring commands\n")
-			socket.send("SAYBATTLE In order to stop a game immediately, please use !kill\n")
+			s.send("SAYBATTLE Hello, the bot accepts all commands from normal spring prefixed with ! instead of /\n")
+			s.send("SAYBATTLE Read Documentation/cmds.txt for a list of spring commands\n")
+			s.send("SAYBATTLE In order to stop a game immediately, please use !kill\n")
 		if command == "SERVERMSG":
 			pm(s,self.battleowner," ".join(args))
 		if command == "LEFTBATTLE" and int(args[0]) == self.battleid and args[1] == self.battleowner:
