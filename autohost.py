@@ -308,8 +308,8 @@ class Main:
 			self.hosted = 1
 			loge(s,"The host has joined the battle")
 			s.send("SAYBATTLE Hello, the bot accepts all commands from normal spring prefixed with ! instead of /\n")
-			s.send("SAYBATTLE Read Documentation/cmds.txt for a list of spring commands\n")
-			s.send("SAYBATTLE In order to stop a game immediately, please use !kill\n")
+			s.send("SAYBATTLE read Documentation/cmds.txt for a list of spring commands\n")
+			s.send("SAYBATTLE in order to stop a game immediately, use !kill\n")
 		if command == "SERVERMSG":
 			pm(s,self.battleowner," ".join(args))
 		if command == "LEFTBATTLE" and int(args[0]) == self.battleid and args[1] == self.battleowner:
