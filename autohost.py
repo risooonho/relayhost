@@ -180,7 +180,7 @@ class Main:
 			pm(s,self.app.config["spawnedby"], "!" + command + " " + " ".join(args[0:]))
 			if args[1].startswith("!") and args[0] == self.battleowner:
 				try:
-					msg = " ".join(args[1:]))
+					msg = " ".join(args[1:])
 					self.u.sayingame("/"+msg[1:])
 				except:
 					exc = traceback.format_exception(sys.exc_info()[0],sys.exc_info()[1],sys.exc_info()[2])
