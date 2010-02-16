@@ -176,8 +176,9 @@ class Main:
 			s.send("RING " + self.app.config["spawnedby"] + "\n")
 		if command == "CLIENTBATTLESTATUS" and len(args) > 0 and self.redirectbattleroom:
 			pm(s,self.app.config["spawnedby"], "!" + command + " " + " ".join(args[0:]) )
-		if command == "SAIDBATTLE" and len(args) > 0 and self.redirectbattleroom:
-			pm(s,self.app.config["spawnedby"], "!" + command + " " + " ".join(args[0:]))
+		if command == "SAIDBATTLE" and len(args) > 0:
+			if self.redirectbattleroom:
+				pm(s,self.app.config["spawnedby"], "!" + command + " " + " ".join(args[0:]))
 			if args[1].startswith("!") and args[0] == self.battleowner:
 				try:
 					msg = " ".join(args[1:])
