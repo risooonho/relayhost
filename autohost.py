@@ -92,7 +92,7 @@ class Main:
 				pass
 
 	def startspring(self,socket,g):
-		currentwworkingdir = os.getcwd()
+		currentworkingdir = os.getcwd()
 		try:
 			self.u.reset()
 			if self.gamestarted:
@@ -142,14 +142,12 @@ class Main:
 			for line in exc:
 				loge(socket,line)
 			loge(socket,"*** EXCEPTION: END")
-			os.chdir(currentwworkingdir)
-			self.gamestarted = False
 		try:
 			if int(self.app.config["keepscript"]) == 0:
 				os.remove(os.path.join(self.scriptbasepath,"%f.txt" % g))
 		except:
 			pass
-		os.chdir(currentwworkingdir)
+		os.chdir(currentworkingdir)
 		self.gamestarted = False
 		if self.noowner == True:
 			loge(socket,"The host is no longer in the battle, exiting")
