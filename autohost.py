@@ -263,8 +263,7 @@ class Main:
 				if args[1] == "!cleanscript" and args[0] == self.battleowner:
 					self.script = ""
 				if args[1] == "!appendscriptline" and args[0] == self.battleowner:
-					if not len(self.script) > 200000:
-						self.script += " ".join(args[2:])+"\n"
+					self.script += " ".join(args[2:])+"\n"
 				if args[1].startswith("#") and args[0] == self.battleowner and self.tsc.users[self.battleowner].bot:
 					try:
 						msg = " ".join(args[1:])
@@ -289,7 +288,7 @@ class Main:
 						f = open(os.path.join(self.scriptbasepath,"%f.txt" % g),"a")
 						s1 = self.script.find("MyPlayerName=")
 						s2 = self.script[s1:].find(";")+1+s1
-						self.script = self.script.replace(self.script[s1:s2],"MyPlayerName=%s;\nAutoHostPort=%i;" % (self.app.config["nick"],int(self.app.config["ahport"])))
+						self.script = self.script.replace(self.script[s1:s2],"MyPlayerName=%s;\n\tAutoHostPort=%i;" % (self.app.config["nick"],int(self.app.config["ahport"])))
 						f.write(self.script)
 						f.close()
 						thread.start_new_thread(self.startspring,(s,g))
