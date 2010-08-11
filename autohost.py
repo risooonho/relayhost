@@ -42,6 +42,7 @@ class Main:
 	used = 0
 	app = 0
 	hosttime = 0.0
+	redirectjoins = False
 	gamestarted = False
 	if platform.system() == "Windows":
 		scriptbasepath = os.environ['USERPROFILE']
@@ -204,43 +205,54 @@ class Main:
 			elif args[1] == "!openbattle" and self.hosted == 1:
 				pm(s,args[0],"E1 | Battle is already hosted")
 				return
-			if self.hosted == 1:
-				if args[1] == "!addstartrect" and self.hosted == 1:
+			if self.hosted == 1 and args[0] == self.battleowner:
+				if args[1] == "!supportscriptpassword":
+					self.redirectjoins = True
+				if args[1] == "!setingamepassword":
+					try:
+						msg = " ".join(args[1:])
+						self.u.sayingame("/adduser "+msg)
+					except:
+						exc = traceback.format_exception(sys.exc_info()[0],sys.exc_info()[1],sys.exc_info()[2])
+						loge(socket,"*** EXCEPTION: BEGIN")
+						for line in exc:
+							loge(self.sock,line)
+				if args[1] == "!addstartrect":
 					s.send("ADDSTARTRECT "+" ".join(args[2:])+"\n")
-				if args[1] == "!setscripttags" and self.hosted == 1:
+				if args[1] == "!setscripttags":
 					s.send("SETSCRIPTTAGS "+" ".join(args[2:])+"\n")
-				if args[1] == "!removestartrect" and self.hosted == 1:
+				if args[1] == "!removestartrect":
 					s.send("REMOVESTARTRECT "+" ".join(args[2:])+"\n")
-				if args[1] == "!leavebattle" and args[0] == self.battleowner:
+				if args[1] == "!leavebattle":
 					s.send("LEAVEBATTLE\n")
 					self.hosted = 0
-				if args[1] == "!updatebattleinfo" and args[0] == self.battleowner:
+				if args[1] == "!updatebattleinfo":
 					s.send("UPDATEBATTLEINFO "+" ".join(args[2:])+"\n")
-				if args[1] == "!kickfrombattle" and args[0] == self.battleowner:
+				if args[1] == "!kickfrombattle"r:
 					s.send("KICKFROMBATTLE "+" ".join(args[2:])+"\n")
-				if args[1] == "!addbot" and args[0] == self.battleowner:
+				if args[1] == "!addbot":
 					s.send("ADDBOT "+" ".join(args[2:])+"\n")
-				if args[1] == "!handicap" and args[0] == self.battleowner:
+				if args[1] == "!handicap":
 					s.send("HANDICAP "+" ".join(args[2:])+"\n")
-				if args[1] == "!forceteamcolor" and args[0] == self.battleowner:
+				if args[1] == "!forceteamcolor":
 					s.send("FORCETEAMCOLOR "+" ".join(args[2:])+"\n")
-				if args[1] == "!forceallyno" and args[0] == self.battleowner:
+				if args[1] == "!forceallyno":
 					s.send("FORCEALLYNO "+" ".join(args[2:])+"\n")
-				if args[1] == "!forceteamno" and args[0] == self.battleowner:
+				if args[1] == "!forceteamno":
 					s.send("FORCETEAMNO "+" ".join(args[2:])+"\n")
-				if args[1] == "!disableunits" and args[0] == self.battleowner:
+				if args[1] == "!disableunits":
 					s.send("DISABLEUNITS "+" ".join(args[2:])+"\n")
-				if args[1] == "!enableallunits" and args[0] == self.battleowner:
+				if args[1] == "!enableallunits":
 					s.send("ENABLEALLUNITS "+" ".join(args[2:])+"\n")
-				if args[1] == "!removebot" and args[0] == self.battleowner:
+				if args[1] == "!removebot":
 					s.send("REMOVEBOT "+" ".join(args[2:])+"\n")
-				if args[1] == "!updatebot" and args[0] == self.battleowner:
+				if args[1] == "!updatebot":
 					s.send("UPDATEBOT "+" ".join(args[2:])+"\n")
-				if args[1] == "!ring" and args[0] == self.battleowner:
+				if args[1] == "!ring":
 					s.send("RING "+" ".join(args[2:])+"\n")
-				if args[1] == "!forcespectatormode" and args[0] == self.battleowner:
+				if args[1] == "!forcespectatormode":
 					s.send("FORCESPECTATORMODE "+" ".join(args[2:])+"\n")
-				if args[1] == "!redirectspring" and args[0] == self.battleowner and len(args) > 1:
+				if args[1] == "!redirectspring" and len(args) > 1:
 					try:
 						if ( self.tsc.users[self.battleowner].bot ):
 							self.redirectspring = bool(args[2])
@@ -250,7 +262,7 @@ class Main:
 						for line in exc:
 							loge(self.sock,line)
 						loge(socket,"*** EXCEPTION: END")
-				if args[1] == "!redirectbattleroom" and args[0] == self.battleowner and len(args) > 1:
+				if args[1] == "!redirectbattleroom"and len(args) > 1:
 					try:
 						if ( self.tsc.users[self.battleowner].bot ):
 							self.redirectbattleroom = bool(args[2])
@@ -260,9 +272,9 @@ class Main:
 						for line in exc:
 							loge(self.sock,line)
 						loge(socket,"*** EXCEPTION: END")
-				if args[1] == "!cleanscript" and args[0] == self.battleowner:
+				if args[1] == "!cleanscript":
 					self.script = ""
-				if args[1] == "!appendscriptline" and args[0] == self.battleowner:
+				if args[1] == "!appendscriptline":
 					self.script += " ".join(args[2:])+"\n"
 				if args[1].startswith("#") and args[0] == self.battleowner and self.tsc.users[self.battleowner].bot:
 					try:
@@ -273,11 +285,11 @@ class Main:
 						loge(socket,"*** EXCEPTION: BEGIN")
 						for line in exc:
 							loge(self.sock,line)
-				if args[1] == "!saybattle" and args[0] == self.battleowner:
+				if args[1] == "!saybattle":
 					s.send("SAYBATTLE "+" ".join(args[2:])+"\n")
-				if args[1] == "!saybattleex" and args[0] == self.battleowner:
+				if args[1] == "!saybattleex":
 					s.send("SAYBATTLEEX "+" ".join(args[2:])+"\n")
-				if args[1] == "!startgame" and args[0] == self.battleowner:
+				if args[1] == "!startgame":
 					if not self.gamestarted:
 						s.send("MYSTATUS 1\n")
 						g = time.time()
@@ -298,16 +310,18 @@ class Main:
 				pm(s,args[0],"E2 | Battle is not hosted")
 
 		if command == "OPENBATTLE":
-
 			self.battleid = int(args[0])
 			self.used = 1
 			loge(s,"Battle hosted succesfully , id is %s" % args[0])
-		if command == "JOINEDBATTLE" and len(args) == 2 and int(args[0]) == self.battleid and args[1] == self.app.config["spawnedby"]:
-			self.hosted = 1
-			loge(s,"The host has joined the battle")
-			s.send("SAYBATTLE Hello, the bot accepts all commands from normal spring prefixed with ! instead of /\n")
-			s.send("SAYBATTLE read Documentation/cmds.txt for a list of spring commands\n")
-			s.send("SAYBATTLE in order to stop a game immediately, use !kill\n")
+		if command == "JOINEDBATTLE" and len(args) == 2 and int(args[0]) == self.battleid:
+			if args[1] == self.battleowner:
+				self.hosted = 1
+				loge(s,"The host has joined the battle")
+				s.send("SAYBATTLE Hello, the bot accepts all commands from normal spring prefixed with ! instead of /\n")
+				s.send("SAYBATTLE read Documentation/cmds.txt for a list of spring commands\n")
+				s.send("SAYBATTLE in order to stop a game immediately, use !kill\n")
+			if self.redirectjoins:
+				pm(s,self.battleowner,command + " " + join(args[0:])) # redirect the join command to the owner so he can manage script password
 		if command == "SERVERMSG":
 			pm(s,self.battleowner," ".join(args))
 		if command == "LEFTBATTLE" and int(args[0]) == self.battleid and args[1] == self.battleowner:
