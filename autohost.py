@@ -210,7 +210,7 @@ class Main:
 					self.redirectjoins = True
 				if args[1] == "!setingamepassword":
 					try:
-						msg = " ".join(args[1:])
+						msg = " ".join(args[2:])
 						self.u.sayingame("/adduser "+msg)
 					except:
 						exc = traceback.format_exception(sys.exc_info()[0],sys.exc_info()[1],sys.exc_info()[2])
