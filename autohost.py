@@ -228,7 +228,7 @@ class Main:
 					self.hosted = 0
 				if args[1] == "!updatebattleinfo":
 					s.send("UPDATEBATTLEINFO "+" ".join(args[2:])+"\n")
-				if args[1] == "!kickfrombattle"r:
+				if args[1] == "!kickfrombattle":
 					s.send("KICKFROMBATTLE "+" ".join(args[2:])+"\n")
 				if args[1] == "!addbot":
 					s.send("ADDBOT "+" ".join(args[2:])+"\n")
