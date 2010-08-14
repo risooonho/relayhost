@@ -33,7 +33,7 @@ def loge(s,m):
 class Main:
 	sock = 0
 	hosted = 0
-	battleowner = ""
+	battleowner = self.app.config["spawnedby"]
 	battleid = 0
 	status = 0
 	pr = 0
@@ -191,7 +191,7 @@ class Main:
 			pm(s,self.app.config["spawnedby"], "!" + command + " " + " ".join(args[0:]))
 		if command == "REQUESTBATTLESTATUS":
 			s.send( "MYBATTLESTATUS 4194816 255\n" )#spectator+synced/white
-		if command == "SAIDPRIVATE" and args[0] not in self.app.config["bans"] and args[0] == self.app.config["spawnedby"]:
+		if command == "SAIDPRIVATE" and args[0] not in self.app.config["bans"] and args[0] == self.battleowner:
 			if args[1] == "!openbattle" and not self.hosted == 1:
 				if len(args) < 6:
 					print "Got invalid openbattle with params:"+" ".join(args)
@@ -313,7 +313,7 @@ class Main:
 			self.battleid = int(args[0])
 			self.used = 1
 			loge(s,"Battle hosted succesfully , id is %s" % args[0])
-		if command == "JOINEDBATTLE" and len(args) == 2 and int(args[0]) == self.battleid:
+		if command == "JOINEDBATTLE" and len(args) >= 2 and int(args[0]) == self.battleid:
 			if args[1] == self.battleowner:
 				self.hosted = 1
 				loge(s,"The host has joined the battle")
