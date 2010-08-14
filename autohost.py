@@ -321,7 +321,7 @@ class Main:
 				s.send("SAYBATTLE read Documentation/cmds.txt for a list of spring commands\n")
 				s.send("SAYBATTLE in order to stop a game immediately, use !kill\n")
 			if self.redirectjoins:
-				pm(s,self.battleowner,command + " " + join(args[0:])) # redirect the join command to the owner so he can manage script password
+				pm(s,self.battleowner,command + " " + " ".join(args[0:])) # redirect the join command to the owner so he can manage script password
 		if command == "SERVERMSG":
 			pm(s,self.battleowner," ".join(args))
 		if command == "LEFTBATTLE" and int(args[0]) == self.battleid and args[1] == self.battleowner:
