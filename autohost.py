@@ -276,7 +276,7 @@ class Main:
 					self.script = ""
 				if args[1] == "!appendscriptline":
 					self.script += " ".join(args[2:])+"\n"
-				if args[1].startswith("#") and args[0] == self.battleowner and self.tsc.users[self.battleowner].bot:
+				if args[1].startswith("#") and args[0] == self.battleowner:
 					try:
 						msg = " ".join(args[1:])
 						self.u.sayingame(msg[1:])
