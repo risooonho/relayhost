@@ -205,9 +205,9 @@ class Main:
 			elif args[1] == "!openbattle" and self.hosted == 1:
 				pm(s,args[0],"E1 | Battle is already hosted")
 				return
+			if args[1] == "!supportscriptpassword":
+				self.redirectjoins = True
 			if self.hosted == 1 and args[0] == self.battleowner:
-				if args[1] == "!supportscriptpassword":
-					self.redirectjoins = True
 				if args[1] == "!setingamepassword":
 					try:
 						msg = " ".join(args[2:])
