@@ -301,7 +301,10 @@ class Main:
 						f = open(os.path.join(self.scriptbasepath,"%f.txt" % g),"a")
 						s1 = self.script.find("MyPlayerName=")
 						s2 = self.script[s1:].find(";")+1+s1
+						s3 = self.script.find("HostIP=")
+						s4 = self.script[s3:].find(";")+1+s3
 						self.script = self.script.replace(self.script[s1:s2],"MyPlayerName=%s;\n\tAutoHostPort=%i;" % (self.app.config["nick"],int(self.app.config["ahport"])))
+						self.script = self.script[0:s3] + self.script[s4:]
 						f.write(self.script)
 						f.close()
 						thread.start_new_thread(self.startspring,(s,g))
@@ -360,3 +363,4 @@ class Main:
 		self.hosted = 0
 		if self.gamestarted:
 			socket.send("MYSTATUS 1\n")
+
