@@ -320,6 +320,7 @@ class Main:
 		if command == "JOINEDBATTLE" and len(args) >= 2 and int(args[0]) == self.battleid:
 			if args[1] == self.battleowner:
 				self.hosted = 1
+				self.noowner = False
 				loge(s,"The host has joined the battle")
 				s.send("SAYBATTLE Hello, the bot accepts all commands from normal spring prefixed with ! instead of /\n")
 				s.send("SAYBATTLE read Documentation/cmds.txt for a list of spring commands\n")
