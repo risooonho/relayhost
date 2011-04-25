@@ -1,4 +1,3 @@
-from colors import *
 from ParseConfig import *
 class Main:
 	sock = 0

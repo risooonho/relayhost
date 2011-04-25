@@ -1,5 +1,4 @@
-from colors import *
-from ParseConfig import *
+from tasbot.ParseConfig import *
 class Main:
 	sock = 0
 	def onload(self,tasc):

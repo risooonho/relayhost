@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
-from colors import *
-from ParseConfig import *
+from tasbot.ParseConfig import *
 import time
 import datetime
 import os
