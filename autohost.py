@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
-from colors import *
-from ParseConfig import *
+from tasbot.ParseConfig import *
 import commands
 import thread
 import signal
@@ -11,22 +10,25 @@ import subprocess
 import traceback
 import platform
 import sys
+from tasbot.customlog import Log
 if platform.system() == "Windows":
 	import win32api
-from utilities import *
+from tasbot.utilities import *
 def pm(s,p,m):
 	try:
-		print yellow+"PM To:%s, Message: %s" %(p,m) + normal
+		Log.Debug("PM To:%s, Message: %s" %(p,m))
 		s.send("SAYPRIVATE %s %s\n" %(p,m))
 	except:
 		pass
 def logc(s,m):
 	try:
+		Log.Debug("SAY autohost %s\n" % m)
 		s.send("SAY autohost %s\n" % m)
 	except:
 		pass
 def loge(s,m):
 	try:
+		Log.Debug("SAYEX autohost %s\n" % m)
 		s.send("SAYEX autohost %s\n" % m)
 	except:
 		pass
@@ -87,7 +89,7 @@ class Main:
 			time.sleep(20.0)
 			try:
 				if not ( not self.noowner and self.hosted == 1) and not self.gamestarted:
-					print "Timeouted hosting"
+					Log.Error("Timeouted hosting")
 					self.killbot()
 			except:
 				pass
@@ -152,7 +154,7 @@ class Main:
 		self.gamestarted = False
 		if self.noowner == True:
 			loge(socket,"The host is no longer in the battle, exiting")
-			print "Exiting"
+			Log.Info("Exiting")
 			self.killbot()
 	def onload(self,tasc):
 		try:
@@ -161,12 +163,8 @@ class Main:
 			self.hosttime = time.time()
 			thread.start_new_thread(self.timeoutthread,())
 			self.u = udpinterface.UDPint(int(self.app.config["ahport"]),self.mscb,self.ecb)
-		except:
-			exc = traceback.format_exception(sys.exc_info()[0],sys.exc_info()[1],sys.exc_info()[2])
-
-
-			for line in exc:
-				print line
+		except Exception, e:
+			Log.Except( e )
 
 	def oncommandfromserver(self,command,args,s):
 		#print "From server: %s | Args : %s" % (command,str(args))
@@ -194,10 +192,10 @@ class Main:
 		if command == "SAIDPRIVATE" and args[0] not in self.app.config["bans"] and args[0] == self.app.config["spawnedby"]:
 			if args[1] == "!openbattle" and not self.hosted == 1:
 				if len(args) < 6:
-					print "Got invalid openbattle with params:"+" ".join(args)
+					Log.Error("Got invalid openbattle with params:"+" ".join(args))
 					return
 				args[5] = self.app.config["hostport"]
-				print "OPENBATTLE "+" ".join(args[2:])
+				Log.Info("OPENBATTLE "+" ".join(args[2:]))
 				s.send("OPENBATTLE "+" ".join(args[2:])+"\n")
 				self.battleowner = args[0]
 				self.noowner = False

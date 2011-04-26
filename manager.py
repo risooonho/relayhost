@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 from tasbot.ParseConfig import *
+import tasbot
 import commands
+from tasbot.customlog import Log
 import thread
 import os
 import sys
@@ -56,10 +58,13 @@ class Main:
 			d.update([("bans",self.app.config["bans"])])
 			d.update([("keepscript",self.app.config["keepscript"])])
 			writeconfigfile(nick+".cfg",d)
-			p = subprocess.Popen(("python","Main.py","-c", "%s" % (nick+".cfg")),stdout=sys.stdout)
-			self.bots.update([(nick,p.pid)])
+			#p = subprocess.Popen(("python","Main.py","-c", "%s" % (nick+".cfg")),stdout=sys.stdout)
+			cfg = "%s" % (nick+".cfg")
+			inst = tasbot.DefaultApp( cfg, cfg+".pid", False, True)
+			inst.run()
+			#self.bots.update([(nick,p.pid)])
 			#print self.bots
-			p.wait()
+			#p.wait()
 			logc(s,"Destroying "+nick)
 			if r in self.ul:
 			    self.ul.remove(r)
@@ -68,10 +73,8 @@ class Main:
 				ist.listfull = False
 				ist.updatestatus(s)
 			ist.botstatus[slot] = False
-		except:
-			print '-'*60
-			traceback.print_exc(file=sys.stdout)
-			print '-'*60
+		except Exception,e:
+			Log.Except( e )
 	def onload(self,tasc):
 		self.tsc = tasc
 		self.bans = []
