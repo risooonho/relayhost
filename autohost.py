@@ -89,7 +89,7 @@ class Main:
 			time.sleep(20.0)
 			try:
 				if not ( not self.noowner and self.hosted == 1) and not self.gamestarted:
-					print "Timeouted hosting"
+					Log.Error("Timeouted hosting")
 					self.killbot()
 			except:
 				pass
@@ -154,7 +154,7 @@ class Main:
 		self.gamestarted = False
 		if self.noowner == True:
 			loge(socket,"The host is no longer in the battle, exiting")
-			print "Exiting"
+			Log.Info("Exiting")
 			self.killbot()
 	def onload(self,tasc):
 		try:
@@ -163,12 +163,8 @@ class Main:
 			self.hosttime = time.time()
 			thread.start_new_thread(self.timeoutthread,())
 			self.u = udpinterface.UDPint(int(self.app.config["ahport"]),self.mscb,self.ecb)
-		except:
-			exc = traceback.format_exception(sys.exc_info()[0],sys.exc_info()[1],sys.exc_info()[2])
-
-
-			for line in exc:
-				print line
+		except Exception, e:
+			Log.Except( e )
 
 	def oncommandfromserver(self,command,args,s):
 		#print "From server: %s | Args : %s" % (command,str(args))
@@ -196,10 +192,10 @@ class Main:
 		if command == "SAIDPRIVATE" and args[0] not in self.app.config["bans"] and args[0] == self.app.config["spawnedby"]:
 			if args[1] == "!openbattle" and not self.hosted == 1:
 				if len(args) < 6:
-					print "Got invalid openbattle with params:"+" ".join(args)
+					Log.Error("Got invalid openbattle with params:"+" ".join(args))
 					return
 				args[5] = self.app.config["hostport"]
-				print "OPENBATTLE "+" ".join(args[2:])
+				Log.Info("OPENBATTLE "+" ".join(args[2:]))
 				s.send("OPENBATTLE "+" ".join(args[2:])+"\n")
 				self.battleowner = args[0]
 				self.noowner = False

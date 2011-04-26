@@ -2,6 +2,7 @@
 from tasbot.ParseConfig import *
 import tasbot
 import commands
+from tasbot.customlog import Log
 import thread
 import os
 import sys
@@ -72,10 +73,8 @@ class Main:
 				ist.listfull = False
 				ist.updatestatus(s)
 			ist.botstatus[slot] = False
-		except:
-			print '-'*60
-			traceback.print_exc(file=sys.stdout)
-			print '-'*60
+		except Exception,e:
+			Log.Except( e )
 	def onload(self,tasc):
 		self.tsc = tasc
 		self.bans = []

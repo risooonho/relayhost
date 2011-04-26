@@ -1,4 +1,5 @@
 import socket
+from tasbot.customlog import Log
 import thread
 import string
 import traceback,sys
@@ -10,7 +11,7 @@ class UDPint:
 		self.players = dict()
 		self.addr = ""
 		thread.start_new_thread(self.mainloop,(messagecb,eventcb))
-		print "UDP Listening on port "+str(port)
+		Log.Info("UDP Listening on port "+str(port))
 	def reset(self):
 		self.players = dict()
 	def mainloop(self,messagecb,eventcb):
@@ -33,15 +34,11 @@ class UDPint:
 				if event == 3: #gameover
 					self.sayingame("/kill")
 				eventcb(ord(data[0]),data[1:])
-			except:
-				print '-'*60
-				traceback.print_exc(file=sys.stdout)
-				print '-'*60
+			except Exception, e:
+				Log.Except( e )
 	def sayingame(self,text):
 		#print "Sending %s to spring" % text
 		try:
 			self.s.sendto(text,self.addr)
-		except:
-			print '-'*60
-			traceback.print_exc(file=sys.stdout)
-			print '-'*60
+		except Exception, e:
+			Log.Except( e )
