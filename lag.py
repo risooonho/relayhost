@@ -1,4 +1,4 @@
-from ParseConfig import *
+from tasbot.ParseConfig import *
 class Main:
 	sock = 0
 	app = 0
@@ -9,4 +9,4 @@ class Main:
 			socket.send("SAYPRIVATE %s %s\n" % ( args[0], str((self.app.lpo-self.app.lp)*1000) +" ms"))
 	def onloggedin(self,socket):
 		pass
-			
+
