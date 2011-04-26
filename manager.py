@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from tasbot.ParseConfig import *
+import tasbot
 import commands
 import thread
 import os
@@ -56,10 +57,13 @@ class Main:
 			d.update([("bans",self.app.config["bans"])])
 			d.update([("keepscript",self.app.config["keepscript"])])
 			writeconfigfile(nick+".cfg",d)
-			p = subprocess.Popen(("python","Main.py","-c", "%s" % (nick+".cfg")),stdout=sys.stdout)
-			self.bots.update([(nick,p.pid)])
+			#p = subprocess.Popen(("python","Main.py","-c", "%s" % (nick+".cfg")),stdout=sys.stdout)
+			cfg = "%s" % (nick+".cfg")
+			inst = tasbot.DefaultApp( cfg, cfg+".pid", False, True)
+			inst.run()
+			#self.bots.update([(nick,p.pid)])
 			#print self.bots
-			p.wait()
+			#p.wait()
 			logc(s,"Destroying "+nick)
 			if r in self.ul:
 			    self.ul.remove(r)

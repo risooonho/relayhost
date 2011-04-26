@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
-from colors import *
-from ParseConfig import *
+from tasbot.ParseConfig import *
 import commands
 import thread
 import signal
@@ -13,7 +12,7 @@ import platform
 import sys
 if platform.system() == "Windows":
 	import win32api
-from utilities import *
+from tasbot.utilities import *
 def pm(s,p,m):
 	try:
 		print yellow+"PM To:%s, Message: %s" %(p,m) + normal
