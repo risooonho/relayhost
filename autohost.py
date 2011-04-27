@@ -198,7 +198,6 @@ class Main:
 				Log.Info("OPENBATTLE "+" ".join(args[2:]))
 				s.send("OPENBATTLE "+" ".join(args[2:])+"\n")
 				self.battleowner = args[0]
-				self.noowner = False
 				return
 			elif args[1] == "!openbattle" and self.hosted == 1:
 				pm(s,args[0],"E1 | Battle is already hosted")
