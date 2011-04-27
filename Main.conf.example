@@ -12,3 +12,6 @@ keepscript=0;
 admins=YOURNICK,YOURNICK2;
 enabled=1;
 springdedpath=/path/to/it;
+---hostip=; if this line is present, it will force spring-dec to bind to given interface
+---springdatapath=; force springdatapath if present
+

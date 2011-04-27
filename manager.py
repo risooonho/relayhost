@@ -49,6 +49,8 @@ class Main:
 			d.update([("springdedpath",self.app.config["springdedpath"])])
 			if "springdatapath" in self.app.config:
 				d.update([("springdatapath",self.app.config["springdatapath"])])
+			if "bindip" in self.app.config:
+				d.update([("bindip",self.app.config["bindip"])])
 			d.update([("admins",self.app.config["admins"])])
 			d.update([("nick",nick)])
 			d.update([("password",p)])
@@ -198,3 +200,4 @@ class Main:
 		socket.send("MYSTATUS %i\n" % int(int(self.listfull)+int(self.disabled)*2))
 	def onloggedin(self,socket):
 		self.updatestatus(socket)
+

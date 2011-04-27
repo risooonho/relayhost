@@ -84,6 +84,7 @@ class Main:
 			win32api.TerminateProcess(handle, 0)
 		else:
 			os.kill(os.getpid(),signal.SIGKILL)
+
 	def timeoutthread(self):
 		while 1:
 			time.sleep(20.0)
@@ -298,10 +299,13 @@ class Main:
 						f = open(os.path.join(self.scriptbasepath,"%f.txt" % g),"a")
 						s1 = self.script.find("MyPlayerName=")
 						s2 = self.script[s1:].find(";")+1+s1
-						s3 = self.script.find("HostIP=")
-						s4 = self.script[s3:].find(";")+1+s3
 						self.script = self.script.replace(self.script[s1:s2],"MyPlayerName=%s;\n\tAutoHostPort=%i;" % (self.app.config["nick"],int(self.app.config["ahport"])))
-						self.script = self.script[0:s3] + self.script[s4:]
+						s1 = self.script.find("HostIP=")
+						s2 = self.script[s1:].find(";")+1+s1
+						if "bindip" in self.app.config:
+							self.script = self.script.replace(self.script[s1:s2],"HostIP=%s" % (self.app.config["bindip"]))
+						else:
+							self.script = self.script[0:s1] + self.script[s2:]
 						f.write(self.script)
 						f.close()
 						thread.start_new_thread(self.startspring,(s,g))
