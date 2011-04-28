@@ -18,7 +18,7 @@ def parseportrange(arg):
 	separator = ":"
 	tempvariable = []
 	if ( arg.find( separator ) >= 0 ):
-		extremes = parselist(arg,separator)
+		extremes = tasbot.ParseConfig.parselist(arg,separator)
 		for num in range( int(extremes[0]), int(extremes[1]) +1 ):
 			tempvariable.append(str(num))
 	else:
@@ -72,12 +72,12 @@ class Main:
 		self.tasclient = tasc
 		self.bans = []
 		self.app = tasc.main
-		self.bans = parselist(self.app.config["bans"],",")
+		self.bans = tasbot.ParseConfig.parselist(self.app.config["bans"],",")
 		self.hostports = []
-		for port in parselist(self.app.config["hostports"],","):
+		for port in tasbot.ParseConfig.parselist(self.app.config["hostports"],","):
 			self.hostports = self.hostports + parseportrange( port )
 		self.controlports = []
-		for port in parselist(self.app.config["ahports"],","):
+		for port in tasbot.ParseConfig.parselist(self.app.config["ahports"],","):
 			self.controlports = self.controlports + parseportrange( port )
 		numhosts = min( len(self.hostports), len(self.controlports) ) # number of host is minimum between amount of free ports for host and amount of free ports for control
 		self.an = []
