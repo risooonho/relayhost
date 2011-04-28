@@ -79,6 +79,7 @@ class Main:
 			sayex(socket,"*** EXCEPTION: END")
 
 	def killbot(self):
+		Log.Info( "setting force_quit True" )
 		self.app.force_quit = True
 
 	def timeoutthread(self):
