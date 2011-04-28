@@ -35,6 +35,7 @@ class Main(IPlugin):
 		self.bots = dict()
 		self.disabled = False
 		self.botstatus = dict()
+		
 	def botthread(self,slot,nick,s,r,p,ist):
 		try:
 			self.say_ah("Spawning (Requested by %s) " % r +nick)

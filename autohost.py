@@ -31,8 +31,7 @@ from tasbot.Plugin import IPlugin
 class Main(IPlugin):
 	def __init__(self,name,tasclient):
 		IPlugin.__init__(self,name,tasclient)
-	def __init__(self):
-		self.sock = None
+		self.sock = self.tasclient.socket
 		self.app = None
 		self.hosted = 0
 		self.battleowner = ""
@@ -157,7 +156,7 @@ class Main(IPlugin):
 			self.killbot()
 	def onload(self,tasc):
 		try:
-			self.tsc = tasc
+			self.tasclient = tasc
 			self.app = tasc.main
 			self.hosttime = time.time()
 			thread.start_new_thread(self.timeoutthread,())
@@ -251,7 +250,7 @@ class Main(IPlugin):
 					s.send("FORCESPECTATORMODE "+" ".join(args[2:])+"\n")
 				if args[1] == "!redirectspring" and len(args) > 1:
 					try:
-						if ( self.tsc.users[self.battleowner].bot ):
+						if ( self.tasclient.users[self.battleowner].bot ):
 							self.redirectspring = bool(args[2])
 					except:
 						exc = traceback.format_exception(sys.exc_info()[0],sys.exc_info()[1],sys.exc_info()[2])
@@ -261,7 +260,7 @@ class Main(IPlugin):
 						sayex(socket,"*** EXCEPTION: END")
 				if args[1] == "!redirectbattleroom"and len(args) > 1:
 					try:
-						if ( self.tsc.users[self.battleowner].bot ):
+						if ( self.tasclient.users[self.battleowner].bot ):
 							self.redirectbattleroom = bool(args[2])
 					except:
 						exc = traceback.format_exception(sys.exc_info()[0],sys.exc_info()[1],sys.exc_info()[2])

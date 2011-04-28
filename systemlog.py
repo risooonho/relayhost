@@ -10,8 +10,10 @@ from tasbot.Plugin import IPlugin
 class Main(IPlugin):
 	def __init__(self,name,tasclient):
 		IPlugin.__init__(self,name,tasclient)
+		
 	def onload(self,tasc):
 		pass
+	
 	def oncommandfromserver(self,command,args,socket):
 		if command == "SAID" and args[0] == "autohost":
 		  Log.Debug("<%s> %s" % ( args[1] , " ".join(args[2:])))
@@ -21,5 +23,6 @@ class Main(IPlugin):
 		  Log.Info("** %s has joined the channel\n" % (args[1]))
 		if command == "LEFT" and args[0] == "autohost":
 		  Log.Info("** %s has left the channel ( %s )\n" % ( args[1] , " ".join(args[2:])))
+		  
 	def onloggedin(self,socket):
 		Log.Info("********** CONNECTED ***********\n")
