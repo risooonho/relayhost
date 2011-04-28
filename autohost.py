@@ -300,7 +300,7 @@ class Main(IPlugin):
 						s1 = self.script.find("HostIP=")
 						s2 = self.script[s1:].find(";")+1+s1
 						if "bindip" in self.app.config:
-							self.script = self.script.replace(self.script[s1:s2],"HostIP=%s" % (self.app.config["bindip"]))
+							self.script = self.script.replace(self.script[s1:s2],"HostIP=%s;" % (self.app.config["bindip"]))
 						else:
 							self.script = self.script[0:s1] + self.script[s2:]
 						f.write(self.script)
