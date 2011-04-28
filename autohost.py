@@ -1,58 +1,57 @@
 # -*- coding: utf-8 -*-
 from tasbot.ParseConfig import *
-import commands
-import thread
-import signal
-import os
-import time
-import udpinterface
-import subprocess
-import traceback
-import platform
-import sys
+import commands,thread,signal,os,time
+import udpinterface,subprocess
+import platform,sys,traceback
 from tasbot.customlog import Log
 if platform.system() == "Windows":
 	import win32api
 from tasbot.utilities import *
 def saypm(s,p,m):
 	try:
-		Log.Debug("PM To:%s, Message: %s" %(p,m))
+		self.logger.Debug("PM To:%s, Message: %s" %(p,m))
 		s.send("SAYPRIVATE %s %s\n" %(p,m))
 	except Exception, e:
-		Log.Except( e )
+		self.logger.Except( e )
 def say(s,m):
 	try:
-		Log.Debug("SAY autohost %s\n" % m)
+		self.logger.Debug("SAY autohost %s\n" % m)
 		s.send("SAY autohost %s\n" % m)
 	except Exception, e:
-		Log.Except( e )
+		self.logger.Except( e )
 def sayex(s,m):
 	try:
-		Log.Debug("SAYEX autohost %s\n" % m)
+		self.logger.Debug("SAYEX autohost %s\n" % m)
 		s.send("SAYEX autohost %s\n" % m)
 	except Exception, e:
-		Log.Except( e )
-class Main:
-	sock = 0
-	hosted = 0
-	battleowner = ""
-	battleid = 0
-	status = 0
-	pr = 0
-	noowner = True
-	script = ""
-	used = 0
-	app = 0
-	hosttime = 0.0
-	redirectjoins = False
-	gamestarted = False
-	if platform.system() == "Windows":
-		scriptbasepath = os.environ['USERPROFILE']
-	else:
-		scriptbasepath = os.environ['HOME']
-	redirectspring = False
-	redirectbattleroom = False
-	users = dict()
+		self.logger.Except( e )
+
+from tasbot.Plugin import IPlugin
+
+class Main(IPlugin):
+	def __init__(self,name,tasclient):
+		IPlugin.__init__(self,name,tasclient)
+		self.sock = self.tasclient.socket
+		self.app = None
+		self.hosted = 0
+		self.battleowner = ""
+		self.battleid = 0
+		self.status = 0
+		self.pr = 0
+		self.noowner = True
+		self.script = ""
+		self.used = 0
+		self.hosttime = 0.0
+		self.redirectjoins = False
+		self.gamestarted = False
+		if platform.system() == "Windows":
+			self.scriptbasepath = os.environ['USERPROFILE']
+		else:
+			self.scriptbasepath = os.environ['HOME']
+		self.redirectspring = False
+		self.redirectbattleroom = False
+		self.users = dict()
+		self.logger.Debug( "INIT MoTH" )
 	def ecb(self,event,data):
 		if self.redirectspring:
 			ags = []
@@ -71,7 +70,8 @@ class Main:
 			if p == self.battleowner:
 				if msg.startswith("!"):
 					self.u.sayingame("/"+msg[1:])
-		except:
+		except Exception, e:
+			self.logger.Except( e )
 			exc = traceback.format_exception(sys.exc_info()[0],sys.exc_info()[1],sys.exc_info()[2])
 			sayex(socket,"*** EXCEPTION: BEGIN")
 			for line in exc:
@@ -79,7 +79,7 @@ class Main:
 			sayex(socket,"*** EXCEPTION: END")
 
 	def killbot(self):
-		Log.Info( "setting force_quit True" )
+		self.logger.Info( "setting force_quit True" )
 		self.app.force_quit = True
 
 	def timeoutthread(self):
@@ -87,7 +87,7 @@ class Main:
 			time.sleep(20.0)
 			try:
 				if not ( not self.noowner and self.hosted == 1) and not self.gamestarted:
-					Log.Error("Timeouted hosting")
+					self.logger.Error("Timeouted hosting")
 					self.killbot()
 			except:
 				pass
@@ -152,17 +152,17 @@ class Main:
 		self.gamestarted = False
 		if self.noowner == True:
 			sayex(socket,"The host is no longer in the battle, exiting")
-			Log.Info("Exiting")
+			self.logger.Info("Exiting")
 			self.killbot()
 	def onload(self,tasc):
 		try:
-			self.tsc = tasc
+			self.tasclient = tasc
 			self.app = tasc.main
 			self.hosttime = time.time()
 			thread.start_new_thread(self.timeoutthread,())
 			self.u = udpinterface.UDPint(int(self.app.config["ahport"]),self.mscb,self.ecb)
 		except Exception, e:
-			Log.Except( e )
+			self.logger.Except( e )
 
 	def oncommandfromserver(self,command,args,s):
 		#print "From server: %s | Args : %s" % (command,str(args))
@@ -190,10 +190,10 @@ class Main:
 		if command == "SAIDPRIVATE" and args[0] not in self.app.config["bans"] and args[0] == self.app.config["spawnedby"]:
 			if args[1] == "!openbattle" and not self.hosted == 1:
 				if len(args) < 6:
-					Log.Error("Got invalid openbattle with params:"+" ".join(args))
+					self.logger.Error("Got invalid openbattle with params:"+" ".join(args))
 					return
 				args[5] = self.app.config["hostport"]
-				Log.Info("OPENBATTLE "+" ".join(args[2:]))
+				self.logger.Info("OPENBATTLE "+" ".join(args[2:]))
 				s.send("OPENBATTLE "+" ".join(args[2:])+"\n")
 				self.battleowner = args[0]
 				return
@@ -250,7 +250,7 @@ class Main:
 					s.send("FORCESPECTATORMODE "+" ".join(args[2:])+"\n")
 				if args[1] == "!redirectspring" and len(args) > 1:
 					try:
-						if ( self.tsc.users[self.battleowner].bot ):
+						if ( self.tasclient.users[self.battleowner].bot ):
 							self.redirectspring = bool(args[2])
 					except:
 						exc = traceback.format_exception(sys.exc_info()[0],sys.exc_info()[1],sys.exc_info()[2])
@@ -260,7 +260,7 @@ class Main:
 						sayex(socket,"*** EXCEPTION: END")
 				if args[1] == "!redirectbattleroom"and len(args) > 1:
 					try:
-						if ( self.tsc.users[self.battleowner].bot ):
+						if ( self.tasclient.users[self.battleowner].bot ):
 							self.redirectbattleroom = bool(args[2])
 					except:
 						exc = traceback.format_exception(sys.exc_info()[0],sys.exc_info()[1],sys.exc_info()[2])

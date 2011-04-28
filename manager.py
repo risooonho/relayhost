@@ -24,12 +24,18 @@ def parseportrange(arg):
 	else:
 		tempvariable.append(arg)
 	return tempvariable
-class Main:
-	ul = []
-	listfull = False
-	bots = dict()
-	disabled = False
-	botstatus = dict()
+	
+from tasbot.Plugin import IPlugin
+
+class Main(IPlugin):
+	def __init__(self,name,tasclient):
+		IPlugin.__init__(self,name,tasclient)
+		self.ul = []
+		self.listfull = False
+		self.bots = dict()
+		self.disabled = False
+		self.botstatus = dict()
+		
 	def botthread(self,slot,nick,s,r,p,ist):
 		try:
 			self.say_ah("Spawning (Requested by %s) " % r +nick)
@@ -67,7 +73,7 @@ class Main:
 				ist.updatestatus(s)
 			ist.botstatus[slot] = False
 		except Exception,e:
-			Log.Except( e )
+			self.logger.Except( e )
 	def onload(self,tasc):
 		self.tasclient = tasc
 		self.bans = []
