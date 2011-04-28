@@ -9,4 +9,4 @@ class Main(IPlugin):
 	def oncommandfromserver(self,command,args,socket):
 		if command == "SAIDPRIVATE" and len(args) > 1 and args[1] == "!help":
 			for l in helptext.split("\n"):
-				self.tasclient..send("SAYPRIVATE %s %s\n" % (args[0],l))
+				self.tasclient.socket.send("SAYPRIVATE %s %s\n" % (args[0],l))
