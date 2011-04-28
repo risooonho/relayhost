@@ -16,13 +16,13 @@ class Main(IPlugin):
 	
 	def oncommandfromserver(self,command,args,socket):
 		if command == "SAID" and args[0] == "autohost":
-		  Log.Debug("<%s> %s" % ( args[1] , " ".join(args[2:])))
+		  self.logger.Debug("<%s> %s" % ( args[1] , " ".join(args[2:])))
 		if command == "SAIDEX" and args[0] == "autohost":
-		  Log.Debug("* %s %s" % ( args[1] , " ".join(args[2:])))
+		  self.logger.Debug("* %s %s" % ( args[1] , " ".join(args[2:])))
 		if command == "JOINED" and args[0] == "autohost":
-		  Log.Info("** %s has joined the channel\n" % (args[1]))
+		  self.logger.Info("** %s has joined the channel\n" % (args[1]))
 		if command == "LEFT" and args[0] == "autohost":
-		  Log.Info("** %s has left the channel ( %s )\n" % ( args[1] , " ".join(args[2:])))
+		  self.logger.Info("** %s has left the channel ( %s )\n" % ( args[1] , " ".join(args[2:])))
 		  
 	def onloggedin(self,socket):
-		Log.Info("********** CONNECTED ***********\n")
+		self.logger.Info("********** CONNECTED ***********\n")

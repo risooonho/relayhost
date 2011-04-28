@@ -73,7 +73,7 @@ class Main(IPlugin):
 				ist.updatestatus(s)
 			ist.botstatus[slot] = False
 		except Exception,e:
-			Log.Except( e )
+			self.logger.Except( e )
 	def onload(self,tasc):
 		self.tasclient = tasc
 		self.bans = []

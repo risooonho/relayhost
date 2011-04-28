@@ -9,22 +9,22 @@ if platform.system() == "Windows":
 from tasbot.utilities import *
 def saypm(s,p,m):
 	try:
-		Log.Debug("PM To:%s, Message: %s" %(p,m))
+		self.logger.Debug("PM To:%s, Message: %s" %(p,m))
 		s.send("SAYPRIVATE %s %s\n" %(p,m))
 	except Exception, e:
-		Log.Except( e )
+		self.logger.Except( e )
 def say(s,m):
 	try:
-		Log.Debug("SAY autohost %s\n" % m)
+		self.logger.Debug("SAY autohost %s\n" % m)
 		s.send("SAY autohost %s\n" % m)
 	except Exception, e:
-		Log.Except( e )
+		self.logger.Except( e )
 def sayex(s,m):
 	try:
-		Log.Debug("SAYEX autohost %s\n" % m)
+		self.logger.Debug("SAYEX autohost %s\n" % m)
 		s.send("SAYEX autohost %s\n" % m)
 	except Exception, e:
-		Log.Except( e )
+		self.logger.Except( e )
 
 from tasbot.Plugin import IPlugin
 
@@ -51,7 +51,7 @@ class Main(IPlugin):
 		self.redirectspring = False
 		self.redirectbattleroom = False
 		self.users = dict()
-		Log.Debug( "INIT MoTH" )
+		self.logger.Debug( "INIT MoTH" )
 	def ecb(self,event,data):
 		if self.redirectspring:
 			ags = []
@@ -71,7 +71,7 @@ class Main(IPlugin):
 				if msg.startswith("!"):
 					self.u.sayingame("/"+msg[1:])
 		except Exception, e:
-			Log.Except( e )
+			self.logger.Except( e )
 			exc = traceback.format_exception(sys.exc_info()[0],sys.exc_info()[1],sys.exc_info()[2])
 			sayex(socket,"*** EXCEPTION: BEGIN")
 			for line in exc:
@@ -79,7 +79,7 @@ class Main(IPlugin):
 			sayex(socket,"*** EXCEPTION: END")
 
 	def killbot(self):
-		Log.Info( "setting force_quit True" )
+		self.logger.Info( "setting force_quit True" )
 		self.app.force_quit = True
 
 	def timeoutthread(self):
@@ -87,7 +87,7 @@ class Main(IPlugin):
 			time.sleep(20.0)
 			try:
 				if not ( not self.noowner and self.hosted == 1) and not self.gamestarted:
-					Log.Error("Timeouted hosting")
+					self.logger.Error("Timeouted hosting")
 					self.killbot()
 			except:
 				pass
@@ -152,7 +152,7 @@ class Main(IPlugin):
 		self.gamestarted = False
 		if self.noowner == True:
 			sayex(socket,"The host is no longer in the battle, exiting")
-			Log.Info("Exiting")
+			self.logger.Info("Exiting")
 			self.killbot()
 	def onload(self,tasc):
 		try:
@@ -162,7 +162,7 @@ class Main(IPlugin):
 			thread.start_new_thread(self.timeoutthread,())
 			self.u = udpinterface.UDPint(int(self.app.config["ahport"]),self.mscb,self.ecb)
 		except Exception, e:
-			Log.Except( e )
+			self.logger.Except( e )
 
 	def oncommandfromserver(self,command,args,s):
 		#print "From server: %s | Args : %s" % (command,str(args))
@@ -190,10 +190,10 @@ class Main(IPlugin):
 		if command == "SAIDPRIVATE" and args[0] not in self.app.config["bans"] and args[0] == self.app.config["spawnedby"]:
 			if args[1] == "!openbattle" and not self.hosted == 1:
 				if len(args) < 6:
-					Log.Error("Got invalid openbattle with params:"+" ".join(args))
+					self.logger.Error("Got invalid openbattle with params:"+" ".join(args))
 					return
 				args[5] = self.app.config["hostport"]
-				Log.Info("OPENBATTLE "+" ".join(args[2:]))
+				self.logger.Info("OPENBATTLE "+" ".join(args[2:]))
 				s.send("OPENBATTLE "+" ".join(args[2:])+"\n")
 				self.battleowner = args[0]
 				return
