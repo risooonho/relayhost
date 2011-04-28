@@ -79,11 +79,7 @@ class Main:
 			sayex(socket,"*** EXCEPTION: END")
 
 	def killbot(self):
-		if platform.system() == "Windows":
-			handle = win32api.OpenProcess(1, 0, os.getpid())
-			win32api.TerminateProcess(handle, 0)
-		else:
-			os.kill(os.getpid(),signal.SIGKILL)
+		self.app.force_quit = True
 
 	def timeoutthread(self):
 		while 1:
