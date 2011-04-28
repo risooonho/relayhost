@@ -7,24 +7,6 @@ from tasbot.customlog import Log
 if platform.system() == "Windows":
 	import win32api
 from tasbot.utilities import *
-def saypm(s,p,m):
-	try:
-		self.logger.Debug("PM To:%s, Message: %s" %(p,m))
-		s.send("SAYPRIVATE %s %s\n" %(p,m))
-	except Exception, e:
-		self.logger.Except( e )
-def say(s,m):
-	try:
-		self.logger.Debug("SAY autohost %s\n" % m)
-		s.send("SAY autohost %s\n" % m)
-	except Exception, e:
-		self.logger.Except( e )
-def sayex(s,m):
-	try:
-		self.logger.Debug("SAYEX autohost %s\n" % m)
-		s.send("SAYEX autohost %s\n" % m)
-	except Exception, e:
-		self.logger.Except( e )
 
 from tasbot.Plugin import IPlugin
 
@@ -61,7 +43,7 @@ class Main(IPlugin):
 					ags.append(ord(c))
 				else:
 					data2 += c
-			saypm(self.sock,self.battleowner,"#"+str(event)+"#".join(ags)+" "+data2)
+			self.saypm(self.battleowner,"#"+str(event)+"#".join(ags)+" "+data2)
 	def onloggedin(self,socket):
 		self.hosted = 0
 		self.sock = socket
@@ -73,10 +55,10 @@ class Main(IPlugin):
 		except Exception, e:
 			self.logger.Except( e )
 			exc = traceback.format_exception(sys.exc_info()[0],sys.exc_info()[1],sys.exc_info()[2])
-			sayex(socket,"*** EXCEPTION: BEGIN")
+			self.sayex("*** EXCEPTION: BEGIN")
 			for line in exc:
-				sayex(self.sock,line)
-			sayex(socket,"*** EXCEPTION: END")
+				self.sayex(line)
+			self.sayex("*** EXCEPTION: END")
 
 	def killbot(self):
 		self.logger.Info( "setting force_quit True" )
@@ -104,7 +86,7 @@ class Main(IPlugin):
 			socket.send("MYSTATUS 1\n")
 			st = time.time()
 			#status,j = commands.getstatusoutput("spring-dedicated "+os.path.join(self.scriptbasepath,"%f.txt" % g ))
-			sayex(socket,"*** Starting spring: command line \"%s\"" % (self.app.config["springdedpath"]+" "+os.path.join(self.scriptbasepath,"%f.txt" % g )))
+			self.sayex("*** Starting spring: command line \"%s\"" % (self.app.config["springdedpath"]+" "+os.path.join(self.scriptbasepath,"%f.txt" % g )))
 			if platform.system() == "Windows":
 				dedpath = "\\".join(self.app.config["springdedpath"].replace("/","\\").split("\\")[:self.app.config["springdedpath"].replace("/","\\").count("\\")])
 				if not dedpath in sys.path:
@@ -125,7 +107,7 @@ class Main(IPlugin):
 				self.output += l
 				l = self.pr.stdout.readline()
 			status = self.pr.wait()
-			sayex(socket,"*** Spring has exited with status %i" % status )
+			self.sayex("*** Spring has exited with status %i" % status )
 			et = time.time()
 
 
@@ -133,16 +115,16 @@ class Main(IPlugin):
 				socket.send("SAYBATTLEEX *** Error: Spring Exited with status %i\n" % status)
 				g = self.output.split("\n")
 				for h in g:
-					sayex(socket,"*** STDOUT+STDERR: "+h)
+					self.sayex("*** STDOUT+STDERR: "+h)
 					time.sleep(float(len(h))/900.0+0.05)
 			socket.send("MYSTATUS 0\n")
 			socket.send("SAYBATTLEEX *** Game ended\n")
 		except:
 			exc = traceback.format_exception(sys.exc_info()[0],sys.exc_info()[1],sys.exc_info()[2])
-			sayex(socket,"*** EXCEPTION: BEGIN")
+			self.sayex("*** EXCEPTION: BEGIN")
 			for line in exc:
-				sayex(socket,line)
-			sayex(socket,"*** EXCEPTION: END")
+				self.sayex(line)
+			self.sayex("*** EXCEPTION: END")
 		try:
 			if int(self.app.config["keepscript"]) == 0:
 				os.remove(os.path.join(self.scriptbasepath,"%f.txt" % g))
@@ -151,7 +133,7 @@ class Main(IPlugin):
 		os.chdir(currentworkingdir)
 		self.gamestarted = False
 		if self.noowner == True:
-			sayex(socket,"The host is no longer in the battle, exiting")
+			self.sayex("The host is no longer in the battle, exiting")
 			self.logger.Info("Exiting")
 			self.killbot()
 	def onload(self,tasc):
@@ -170,21 +152,21 @@ class Main(IPlugin):
 		if command == "RING" and len(args) > 0:
 			s.send("RING " + self.app.config["spawnedby"] + "\n")
 		if command == "CLIENTBATTLESTATUS" and len(args) > 0 and self.redirectbattleroom:
-			saypm(s,self.app.config["spawnedby"], "!" + command + " " + " ".join(args[0:]) )
+			self.saypm(self.app.config["spawnedby"], "!" + command + " " + " ".join(args[0:]) )
 		if command == "SAIDBATTLE" and len(args) > 0:
 			if self.redirectbattleroom:
-				saypm(s,self.app.config["spawnedby"], "!" + command + " " + " ".join(args[0:]))
+				self.saypm(self.app.config["spawnedby"], "!" + command + " " + " ".join(args[0:]))
 			if args[1].startswith("!") and args[0] == self.battleowner:
 				try:
 					msg = " ".join(args[1:])
 					self.u.sayingame("/"+msg[1:])
 				except:
 					exc = traceback.format_exception(sys.exc_info()[0],sys.exc_info()[1],sys.exc_info()[2])
-					sayex(socket,"*** EXCEPTION: BEGIN")
+					self.sayex("*** EXCEPTION: BEGIN")
 					for line in exc:
-						sayex(self.sock,line)
+						self.sayex(line)
 		if command == "SAIDBATTLEEX" and len(args) > 0 and self.redirectbattleroom:
-			saypm(s,self.app.config["spawnedby"], "!" + command + " " + " ".join(args[0:]))
+			self.saypm(self.app.config["spawnedby"], "!" + command + " " + " ".join(args[0:]))
 		if command == "REQUESTBATTLESTATUS":
 			s.send( "MYBATTLESTATUS 4194816 255\n" )#spectator+synced/white
 		if command == "SAIDPRIVATE" and args[0] not in self.app.config["bans"] and args[0] == self.app.config["spawnedby"]:
@@ -198,7 +180,7 @@ class Main(IPlugin):
 				self.battleowner = args[0]
 				return
 			elif args[1] == "!openbattle" and self.hosted == 1:
-				saypm(s,args[0],"E1 | Battle is already hosted")
+				self.saypm(args[0],"E1 | Battle is already hosted")
 				return
 			elif args[1] == "!supportscriptpassword":
 				self.redirectjoins = True
@@ -210,9 +192,9 @@ class Main(IPlugin):
 						self.u.sayingame("/adduser "+msg)
 					except:
 						exc = traceback.format_exception(sys.exc_info()[0],sys.exc_info()[1],sys.exc_info()[2])
-						sayex(socket,"*** EXCEPTION: BEGIN")
+						self.sayex("*** EXCEPTION: BEGIN")
 						for line in exc:
-							sayex(self.sock,line)
+							self.sayex(line)
 				if args[1] == "!addstartrect":
 					s.send("ADDSTARTRECT "+" ".join(args[2:])+"\n")
 				if args[1] == "!setscripttags":
@@ -254,20 +236,20 @@ class Main(IPlugin):
 							self.redirectspring = bool(args[2])
 					except:
 						exc = traceback.format_exception(sys.exc_info()[0],sys.exc_info()[1],sys.exc_info()[2])
-						sayex(socket,"*** EXCEPTION: BEGIN")
+						self.sayex("*** EXCEPTION: BEGIN")
 						for line in exc:
-							sayex(self.sock,line)
-						sayex(socket,"*** EXCEPTION: END")
+							self.sayex(line)
+						self.sayex("*** EXCEPTION: END")
 				if args[1] == "!redirectbattleroom"and len(args) > 1:
 					try:
 						if ( self.tasclient.users[self.battleowner].bot ):
 							self.redirectbattleroom = bool(args[2])
 					except:
 						exc = traceback.format_exception(sys.exc_info()[0],sys.exc_info()[1],sys.exc_info()[2])
-						sayex(socket,"*** EXCEPTION: BEGIN")
+						self.sayex("*** EXCEPTION: BEGIN")
 						for line in exc:
-							sayex(self.sock,line)
-						sayex(socket,"*** EXCEPTION: END")
+							self.sayex(line)
+						self.sayex("*** EXCEPTION: END")
 				if args[1] == "!cleanscript":
 					self.script = ""
 				if args[1] == "!appendscriptline":
@@ -278,9 +260,9 @@ class Main(IPlugin):
 						self.u.sayingame(msg[1:])
 					except:
 						exc = traceback.format_exception(sys.exc_info()[0],sys.exc_info()[1],sys.exc_info()[2])
-						sayex(socket,"*** EXCEPTION: BEGIN")
+						self.sayex("*** EXCEPTION: BEGIN")
 						for line in exc:
-							sayex(self.sock,line)
+							self.sayex(line)
 				if args[1] == "!saybattle":
 					s.send("SAYBATTLE "+" ".join(args[2:])+"\n")
 				if args[1] == "!saybattleex":
@@ -307,29 +289,29 @@ class Main(IPlugin):
 						f.close()
 						thread.start_new_thread(self.startspring,(s,g))
 					else:
-						saypm(s,args[0],"E3 | Battle already started")
+						self.saypm(args[0],"E3 | Battle already started")
 			else:
-				saypm(s,args[0],"E2 | Battle is not hosted")
+				self.saypm(args[0],"E2 | Battle is not hosted")
 
 		if command == "OPENBATTLE":
 			self.battleid = int(args[0])
 			self.used = 1
-			sayex(s,"Battle hosted succesfully , id is %s" % args[0])
+			self.sayex("Battle hosted succesfully , id is %s" % args[0])
 		if command == "JOINEDBATTLE" and len(args) >= 2 and int(args[0]) == self.battleid:
 			if args[1] == self.battleowner:
 				self.hosted = 1
 				self.noowner = False
-				sayex(s,"The host has joined the battle")
+				self.sayex("The host has joined the battle")
 				s.send("SAYBATTLE Hello, the bot accepts all commands from normal spring prefixed with ! instead of /\n")
 				s.send("SAYBATTLE read Documentation/cmds.txt for a list of spring commands\n")
 				s.send("SAYBATTLE in order to stop a game immediately, use !kill\n")
 			if self.redirectjoins:
-				saypm(s,self.battleowner,command + " " + " ".join(args[0:])) # redirect the join command to the owner so he can manage script password
+				self.saypm(self.battleowner,command + " " + " ".join(args[0:])) # redirect the join command to the owner so he can manage script password
 		if command == "SERVERMSG":
-			saypm(s,self.battleowner," ".join(args))
+			self.saypm(self.battleowner," ".join(args))
 		if command == "LEFTBATTLE" and int(args[0]) == self.battleid and args[1] == self.battleowner:
 			if	not self.gamestarted:
-				sayex(s,"The host has left the battle and the game isn't running, exiting")
+				self.sayex("The host has left the battle and the game isn't running, exiting")
 				s.send("LEAVEBATTLE\n")
 				try:
 					if platform.system() == "Windows":
@@ -345,7 +327,7 @@ class Main(IPlugin):
 
 		if command == "REMOVEUSER" and args[0] == self.battleowner:
 			if	not self.gamestarted:
-				sayex(s,"The host disconnected and game not started, exiting")
+				self.sayex("The host disconnected and game not started, exiting")
 				try:
 					if platform.system() == "Windows":
 						handle = win32api.OpenProcess(1, 0, self.pr.pid)
@@ -363,3 +345,21 @@ class Main(IPlugin):
 		if self.gamestarted:
 			socket.send("MYSTATUS 1\n")
 
+	def saypm(self,p,m):
+		try:
+			self.logger.Debug("PM To:%s, Message: %s" %(p,m))
+			self.tasclient.socket.send("SAYPRIVATE %s %s\n" %(p,m))
+		except Exception, e:
+			self.logger.Except( e )
+	def say(self,m):
+		try:
+			self.logger.Debug("SAY autohost %s\n" % m)
+			self.tasclient.socket.send("SAY autohost %s\n" % m)
+		except Exception, e:
+			self.logger.Except( e )
+	def sayex(self,m):
+		try:
+			self.logger.Debug("SAYEX autohost %s\n" % m)
+			self.tasclient.socket.send("SAYEX autohost %s\n" % m)
+		except Exception, e:
+			self.logger.Except( e )
