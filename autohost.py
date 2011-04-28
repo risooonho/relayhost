@@ -71,6 +71,7 @@ class Main(IPlugin):
 				if not ( not self.noowner and self.hosted == 1) and not self.gamestarted:
 					self.logger.Error("Timeouted hosting")
 					self.killbot()
+					return
 			except:
 				pass
 
@@ -141,7 +142,7 @@ class Main(IPlugin):
 			self.tasclient = tasc
 			self.app = tasc.main
 			self.hosttime = time.time()
-			thread.start_new_thread(self.timeoutthread,())
+			self.startThread(self.timeoutthread)
 			self.u = udpinterface.UDPint(int(self.app.config["ahport"]),self.mscb,self.ecb)
 		except Exception, e:
 			self.logger.Except( e )
