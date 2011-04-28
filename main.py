@@ -1,10 +1,10 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-import tasbot,sys
+import tasbot,sys,os
 from tasbot.customlog import Log
 
 if __name__=="__main__":			
-	configfile = "Main.conf"
+	configfile = os.path.join( os.getcwd(), "Main.conf")
 	config = tasbot.ParseConfig.Config(configfile)
 	Log.Init( config['logfile'], 'debug', True )
 	
