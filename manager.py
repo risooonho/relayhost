@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from tasbot.ParseConfig import *
+#from tasbot.ParseConfig import *
 import tasbot
 import commands
 from tasbot.customlog import Log
@@ -13,16 +13,7 @@ import platform
 import time
 if platform.system() == "Windows":
   import win32api
-def logc(s,m):
-	try:
-		s.send("SAY autohost %s\n" % m)
-	except:
-		pass
-def loge(s,m):
-	try:
-		s.send("SAYEX autohost %s\n" % m)
-	except:
-		pass
+
 def parseportrange(arg):
 	separator = ":"
 	tempvariable = []
@@ -41,7 +32,7 @@ class Main:
 	botstatus = dict()
 	def botthread(self,slot,nick,s,r,p,ist):
 		try:
-			logc(s,"Spawning (Requested by %s) " % r +nick)
+			self.say_ah("Spawning (Requested by %s) " % r +nick)
 			d = dict()
 			d.update([("serveraddr",self.app.config["serveraddr"])])
 			d.update([("spawnedby",r)])
@@ -59,7 +50,7 @@ class Main:
 			d.update([("plugins","channels,autohost,help")])
 			d.update([("bans",self.app.config["bans"])])
 			d.update([("keepscript",self.app.config["keepscript"])])
-			writeconfigfile(nick+".cfg",d)
+			tasbot.ParseConfig.writeconfigfile(nick+".cfg",d)
 			#p = subprocess.Popen(("python","Main.py","-c", "%s" % (nick+".cfg")),stdout=sys.stdout)
 			cfg = "%s" % (nick+".cfg")
 			inst = tasbot.DefaultApp( cfg, cfg+".pid", False, True)
@@ -67,7 +58,7 @@ class Main:
 			#self.bots.update([(nick,p.pid)])
 			#print self.bots
 			#p.wait()
-			logc(s,"Destroying "+nick)
+			self.say_ah("Destroying "+nick)
 			if r in self.ul:
 			    self.ul.remove(r)
 
@@ -78,7 +69,7 @@ class Main:
 		except Exception,e:
 			Log.Except( e )
 	def onload(self,tasc):
-		self.tsc = tasc
+		self.tasclient = tasc
 		self.bans = []
 		self.app = tasc.main
 		self.bans = parselist(self.app.config["bans"],",")
@@ -181,7 +172,7 @@ class Main:
 			#elif command == "SAIDPRIVATE" and len(args) >= 1 and :
 			#	socket.send("SAYPRIVATE %s %s\n" %(args[0],"\002"))
 			elif command == "LEFT" and args[0] == "autohost" and len(args) > 4 and args[3] == "inconsistent" and args[1] in self.bots:
-				logc(socket,"Bot(%s) kicked by inconsistent data error , killing" % args[1])
+				self.say_ah("Bot(%s) kicked by inconsistent data error , killing" % args[1])
 				try:
 					if platform.system() == "Windows":
 					  handle = win32api.OpenProcess(1, 0, self.bots[args[1]])
@@ -192,12 +183,26 @@ class Main:
 					pass
 		except:
 			exc = traceback.format_exception(sys.exc_info()[0],sys.exc_info()[1],sys.exc_info()[2])
-			loge(socket,"*** EXCEPTION: BEGIN")
+			self.sayex_ah("*** EXCEPTION: BEGIN")
 			for line in exc:
-				loge(socket,line)
-			loge(socket,"*** EXCEPTION: END")
+				self.sayex_ah(line)
+			self.sayex_ah("*** EXCEPTION: END")
+
 	def updatestatus(self,socket):
 		socket.send("MYSTATUS %i\n" % int(int(self.listfull)+int(self.disabled)*2))
+
 	def onloggedin(self,socket):
 		self.updatestatus(socket)
+		
+	def say_ah(self,message):
+		try:
+			self.tasclient.say("autohost", message)
+		except:
+			pass
+
+	def sayex_ah(self,message):
+		try:
+			self.tasclient.sayex("autohost", message)
+		except:
+			pass		
 
