@@ -1,7 +1,11 @@
 from tasbot.ParseConfig import *
-class Main:
-	sock = 0
-	app = 0
+from tasbot.Plugin import IPlugin
+
+class Main(IPlugin):
+	def __init__(self,name,tasclient):
+		IPlugin.__init__(self,name,tasclient)
+		self.sock = None
+		self.app = None
 	def onload(self,tasc):
 		self.app = tasc
 	def oncommandfromserver(self,command,args,socket):

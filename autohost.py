@@ -1,15 +1,8 @@
 # -*- coding: utf-8 -*-
 from tasbot.ParseConfig import *
-import commands
-import thread
-import signal
-import os
-import time
-import udpinterface
-import subprocess
-import traceback
-import platform
-import sys
+import commands,thread,signal,os,time
+import udpinterface,subprocess
+import platform,sys,traceback
 from tasbot.customlog import Log
 if platform.system() == "Windows":
 	import win32api
@@ -32,27 +25,34 @@ def sayex(s,m):
 		s.send("SAYEX autohost %s\n" % m)
 	except Exception, e:
 		Log.Except( e )
-class Main:
-	sock = 0
-	hosted = 0
-	battleowner = ""
-	battleid = 0
-	status = 0
-	pr = 0
-	noowner = True
-	script = ""
-	used = 0
-	app = 0
-	hosttime = 0.0
-	redirectjoins = False
-	gamestarted = False
-	if platform.system() == "Windows":
-		scriptbasepath = os.environ['USERPROFILE']
-	else:
-		scriptbasepath = os.environ['HOME']
-	redirectspring = False
-	redirectbattleroom = False
-	users = dict()
+
+from tasbot.Plugin import IPlugin
+
+class Main(IPlugin):
+	def __init__(self,name,tasclient):
+		IPlugin.__init__(self,name,tasclient)
+	def __init__(self):
+		self.sock = None
+		self.app = None
+		self.hosted = 0
+		self.battleowner = ""
+		self.battleid = 0
+		self.status = 0
+		self.pr = 0
+		self.noowner = True
+		self.script = ""
+		self.used = 0
+		self.hosttime = 0.0
+		self.redirectjoins = False
+		self.gamestarted = False
+		if platform.system() == "Windows":
+			self.scriptbasepath = os.environ['USERPROFILE']
+		else:
+			self.scriptbasepath = os.environ['HOME']
+		self.redirectspring = False
+		self.redirectbattleroom = False
+		self.users = dict()
+		Log.Debug( "INIT MoTH" )
 	def ecb(self,event,data):
 		if self.redirectspring:
 			ags = []
@@ -71,7 +71,8 @@ class Main:
 			if p == self.battleowner:
 				if msg.startswith("!"):
 					self.u.sayingame("/"+msg[1:])
-		except:
+		except Exception, e:
+			Log.Except( e )
 			exc = traceback.format_exception(sys.exc_info()[0],sys.exc_info()[1],sys.exc_info()[2])
 			sayex(socket,"*** EXCEPTION: BEGIN")
 			for line in exc:

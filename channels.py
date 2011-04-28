@@ -1,4 +1,8 @@
-class Main:
+from tasbot.Plugin import IPlugin
+
+class Main(IPlugin):
+	def __init__(self,name,tasclient):
+		IPlugin.__init__(self,name,tasclient)
 	sock = 0
 	def onload(self,tasc):
 		pass
