@@ -56,10 +56,12 @@ class Main(IPlugin):
 			d.update([("plugins","channels,autohost,help")])
 			d.update([("bans",self.app.config["bans"])])
 			d.update([("keepscript",self.app.config["keepscript"])])
-			tasbot.ParseConfig.writeconfigfile(nick+".cfg",d)
-			#p = subprocess.Popen(("python","Main.py","-c", "%s" % (nick+".cfg")),stdout=sys.stdout)
 			cfg = "%s" % (nick+".cfg")
-			inst = tasbot.DefaultApp( cfg, cfg+".pid", False, True)
+			cfg_path = os.path.join(self.app.config['cfg_dir'],cfg )
+			tasbot.ParseConfig.writeconfigfile(cfg_path,d)
+			#p = subprocess.Popen(("python","Main.py","-c", "%s" % (nick+".cfg")),stdout=sys.stdout)
+
+			inst = tasbot.DefaultApp( cfg_path, cfg_path+".pid", False, True)
 			inst.run()
 			#self.bots.update([(nick,p.pid)])
 			#print self.bots
