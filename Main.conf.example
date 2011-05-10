@@ -1,7 +1,4 @@
-serveraddr=springrts.com;
-serverport=8200;
-nick=NICK;
-password=PASSWORD;
+---the following things need to be added in addition to the basic config entries listed in tasbot's example config file
 plugins=channels,manager,help,lag,systemlog;
 slavesnick=account;
 slavespass=password;
