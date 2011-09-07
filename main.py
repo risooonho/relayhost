@@ -4,6 +4,7 @@ import tasbot,sys,os
 from tasbot.customlog import Log
 
 if __name__=="__main__":			
+	tasbot.check_max_version((0,9))
 	configfile = os.path.join( os.getcwd(), "Main.conf")
 	config = tasbot.ParseConfig.Config(configfile)
 	Log.Init( config['logfile'], 'debug', True )
