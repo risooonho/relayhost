@@ -11,13 +11,14 @@ class UDPint:
 		self.players = dict()
 		self.addr = ""
 		thread.start_new_thread(self.mainloop,(messagecb,eventcb))
-		Log.Info("UDP Listening on port "+str(port))
+		Log.info("UDP Listening on port "+str(port))
+
 	def reset(self):
 		self.players = dict()
+
 	def mainloop(self,messagecb,eventcb):
 		while 1:
 			try:
-
 				data, address = self.s.recvfrom(8192)
 				self.addr = address
 				event = ord(data[0])
@@ -35,10 +36,11 @@ class UDPint:
 					self.sayingame("/kill")
 				eventcb(ord(data[0]),data[1:])
 			except Exception, e:
-				Log.Except( e )
+				Log.exception( e )
+
 	def sayingame(self,text):
 		#print "Sending %s to spring" % text
 		try:
 			self.s.sendto(text,self.addr)
 		except Exception, e:
-			Log.Except( e )
+			Log.exception( e )

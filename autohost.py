@@ -1,14 +1,21 @@
 # -*- coding: utf-8 -*-
-from tasbot.ParseConfig import *
-import commands,thread,signal,os,time
-import udpinterface,subprocess
-import platform,sys,traceback
-from tasbot.customlog import Log
+import commands
+import thread
+import signal
+import os
+import time
+import subprocess
+import platform
+import sys
+import traceback
 if platform.system() == "Windows":
 	import win32api
-from tasbot.utilities import *
 
-from tasbot.Plugin import IPlugin
+from tasbot.utilities import *
+from tasbot.plugin import IPlugin
+from tasbot.customlog import Log
+
+import udpinterface
 
 class Main(IPlugin):
 	def __init__(self,name,tasclient):
@@ -33,7 +40,8 @@ class Main(IPlugin):
 		self.redirectspring = False
 		self.redirectbattleroom = False
 		self.users = dict()
-		self.logger.Debug( "INIT MoTH" )
+		self.logger.debug( "INIT MoTH" )
+
 	def ecb(self,event,data):
 		if self.redirectspring:
 			ags = []
@@ -44,16 +52,18 @@ class Main(IPlugin):
 				else:
 					data2 += c
 			self.saypm(self.battleowner,"#"+str(event)+"#".join(ags)+" "+data2)
+
 	def onloggedin(self,socket):
 		self.hosted = 0
 		self.sock = socket
+
 	def mscb(self,p,msg):
 		try:
 			if p == self.battleowner:
 				if msg.startswith("!"):
 					self.u.sayingame("/"+msg[1:])
 		except Exception, e:
-			self.logger.Except( e )
+			self.logger.exception(e)
 			exc = traceback.format_exception(sys.exc_info()[0],sys.exc_info()[1],sys.exc_info()[2])
 			self.sayex("*** EXCEPTION: BEGIN")
 			for line in exc:
@@ -61,7 +71,7 @@ class Main(IPlugin):
 			self.sayex("*** EXCEPTION: END")
 
 	def killbot(self):
-		self.logger.Info( "setting force_quit True" )
+		self.logger.info( "setting force_quit True" )
 		self.app.force_quit = True
 
 	def timeoutthread(self):
@@ -69,7 +79,7 @@ class Main(IPlugin):
 			time.sleep(20.0)
 			try:
 				if not ( not self.noowner and self.hosted == 1) and not self.gamestarted:
-					self.logger.Error("Timeouted hosting")
+					self.logger.error("Timeouted hosting")
 					self.killbot()
 					return
 			except:
@@ -87,13 +97,13 @@ class Main(IPlugin):
 			socket.send("MYSTATUS 1\n")
 			st = time.time()
 			#status,j = commands.getstatusoutput("spring-dedicated "+os.path.join(self.scriptbasepath,"%f.txt" % g ))
-			self.sayex("*** Starting spring: command line \"%s\"" % (self.app.config["springdedpath"]+" "+os.path.join(self.scriptbasepath,"%f.txt" % g )))
+			self.sayex("*** Starting spring: command line \"%s\"" % (self.app.config.get('tasbot', "springdedpath")+" "+os.path.join(self.scriptbasepath,"%f.txt" % g )))
 			if platform.system() == "Windows":
-				dedpath = "\\".join(self.app.config["springdedpath"].replace("/","\\").split("\\")[:self.app.config["springdedpath"].replace("/","\\").count("\\")])
+				dedpath = "\\".join(self.app.config.get('tasbot', "springdedpath").replace("/","\\").split("\\")[:self.app.config.get('tasbot', "springdedpath").replace("/","\\").count("\\")])
 				if not dedpath in sys.path:
 					sys.path.append(dedpath)
-			if "springdatapath" in self.app.config:
-				springdatapath = self.app.config["springdatapath"]
+			if self.app.config.has_option('tasbot', "springdatapath"):
+				springdatapath = self.app.config.get('tasbot', "springdatapath")
 				if not springdatapath in sys.path:
 					sys.path.append(springdatapath)
 				os.chdir(springdatapath)
@@ -101,7 +111,7 @@ class Main(IPlugin):
 				springdatapath = None
 			if springdatapath!= None:
 				os.environ['SPRING_DATADIR'] = springdatapath
-			self.pr = subprocess.Popen((self.app.config["springdedpath"],os.path.join(self.scriptbasepath,"%f.txt" % g )),stdout=subprocess.PIPE,stderr=subprocess.STDOUT,cwd=springdatapath)
+			self.pr = subprocess.Popen((self.app.config.get('tasbot', "springdedpath"),os.path.join(self.scriptbasepath,"%f.txt" % g )),stdout=subprocess.PIPE,stderr=subprocess.STDOUT,cwd=springdatapath)
 			self.gamestarted = True
 			l = self.pr.stdout.readline()
 			while len(l) > 0:
@@ -127,7 +137,7 @@ class Main(IPlugin):
 				self.sayex(line)
 			self.sayex("*** EXCEPTION: END")
 		try:
-			if int(self.app.config["keepscript"]) == 0:
+			if int(self.app.config.get('autohost', "keepscript")) == 0:
 				os.remove(os.path.join(self.scriptbasepath,"%f.txt" % g))
 		except:
 			pass
@@ -135,28 +145,29 @@ class Main(IPlugin):
 		self.gamestarted = False
 		if self.noowner == True:
 			self.sayex("The host is no longer in the battle, exiting")
-			self.logger.Info("Exiting")
+			self.logger.info("Exiting")
 			self.killbot()
+
 	def onload(self,tasc):
 		try:
 			self.tasclient = tasc
 			self.app = tasc.main
 			self.hosttime = time.time()
-			self.startThread(self.timeoutthread)
-			self.u = udpinterface.UDPint(int(self.app.config["ahport"]),self.mscb,self.ecb)
+			self.start_thread(self.timeoutthread)
+			self.u = udpinterface.UDPint(int(self.app.config.get('autohost', "ahport")),self.mscb,self.ecb)
 		except Exception, e:
-			self.logger.Except( e )
+			self.logger.exception(e)
 
 	def oncommandfromserver(self,command,args,s):
 		#print "From server: %s | Args : %s" % (command,str(args))
 		self.sock = s
 		if command == "RING" and len(args) > 0:
-			s.send("RING " + self.app.config["spawnedby"] + "\n")
+			s.send("RING " + self.app.config.get('autohost', "spawnedby") + "\n")
 		if command == "CLIENTBATTLESTATUS" and len(args) > 0 and self.redirectbattleroom:
-			self.saypm(self.app.config["spawnedby"], "!" + command + " " + " ".join(args[0:]) )
+			self.saypm(self.app.config.get('autohost', "spawnedby"), "!" + command + " " + " ".join(args[0:]) )
 		if command == "SAIDBATTLE" and len(args) > 0:
 			if self.redirectbattleroom:
-				self.saypm(self.app.config["spawnedby"], "!" + command + " " + " ".join(args[0:]))
+				self.saypm(self.app.config.get('autohost', "spawnedby"), "!" + command + " " + " ".join(args[0:]))
 			if args[1].startswith("!") and args[0] == self.battleowner:
 				try:
 					msg = " ".join(args[1:])
@@ -167,16 +178,16 @@ class Main(IPlugin):
 					for line in exc:
 						self.sayex(line)
 		if command == "SAIDBATTLEEX" and len(args) > 0 and self.redirectbattleroom:
-			self.saypm(self.app.config["spawnedby"], "!" + command + " " + " ".join(args[0:]))
+			self.saypm(self.app.config.get('autohost', "spawnedby"), "!" + command + " " + " ".join(args[0:]))
 		if command == "REQUESTBATTLESTATUS":
 			s.send( "MYBATTLESTATUS 4194816 255\n" )#spectator+synced/white
-		if command == "SAIDPRIVATE" and args[0] not in self.app.config["bans"] and args[0] == self.app.config["spawnedby"]:
+		if command == "SAIDPRIVATE" and args[0] not in self.app.config.get('autohost', "bans") and args[0] == self.app.config.get('autohost', "spawnedby"):
 			if args[1] == "!openbattle" and not self.hosted == 1:
 				if len(args) < 6:
-					self.logger.Error("Got invalid openbattle with params:"+" ".join(args))
+					self.logger.error("Got invalid openbattle with params:"+" ".join(args))
 					return
-				args[5] = self.app.config["hostport"]
-				self.logger.Info("OPENBATTLE "+" ".join(args[2:]))
+				args[5] = self.app.config.get('autohost',"hostport")
+				self.logger.info("OPENBATTLE "+" ".join(args[2:]))
 				s.send("OPENBATTLE "+" ".join(args[2:])+"\n")
 				self.battleowner = args[0]
 				return
@@ -279,11 +290,12 @@ class Main(IPlugin):
 						f = open(os.path.join(self.scriptbasepath,"%f.txt" % g),"a")
 						s1 = self.script.find("MyPlayerName=")
 						s2 = self.script[s1:].find(";")+1+s1
-						self.script = self.script.replace(self.script[s1:s2],"MyPlayerName=%s;\n\tAutoHostPort=%i;" % (self.app.config["nick"],int(self.app.config["ahport"])))
+						self.script = self.script.replace(self.script[s1:s2],"MyPlayerName=%s;\n\tAutoHostPort=%i;" % 
+							(self.app.config.get('tasbot', "nick"),int(self.app.config.get('autohost', "ahport"))))
 						s1 = self.script.find("HostIP=")
 						s2 = self.script[s1:].find(";")+1+s1
-						if "bindip" in self.app.config:
-							self.script = self.script.replace(self.script[s1:s2],"HostIP=%s;" % (self.app.config["bindip"]))
+						if self.app.config.has_option('autohost', "bindip"):
+							self.script = self.script.replace(self.script[s1:s2],"HostIP=%s;" % (self.app.config.get('autohost', "bindip")))
 						else:
 							self.script = self.script[0:s1] + self.script[s2:]
 						f.write(self.script)
@@ -348,19 +360,21 @@ class Main(IPlugin):
 
 	def saypm(self,p,m):
 		try:
-			self.logger.Debug("PM To:%s, Message: %s" %(p,m))
+			self.logger.debug("PM To:%s, Message: %s" %(p,m))
 			self.tasclient.socket.send("SAYPRIVATE %s %s\n" %(p,m))
 		except Exception, e:
-			self.logger.Except( e )
+			self.logger.exception(e)
+
 	def say(self,m):
 		try:
-			self.logger.Debug("SAY autohost %s\n" % m)
+			self.logger.debug("SAY autohost %s\n" % m)
 			self.tasclient.socket.send("SAY autohost %s\n" % m)
 		except Exception, e:
-			self.logger.Except( e )
+			self.logger.exception(e)
+
 	def sayex(self,m):
 		try:
-			self.logger.Debug("SAYEX autohost %s\n" % m)
+			self.logger.debug("SAYEX autohost %s\n" % m)
 			self.tasclient.socket.send("SAYEX autohost %s\n" % m)
 		except Exception, e:
-			self.logger.Except( e )
+			self.logger.exception(e)
