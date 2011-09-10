@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
-#from tasbot.ParseConfig import *
-import tasbot
+from ConfigParser import SafeConfigParser as ConfigParser
 import commands
-from tasbot.customlog import Log
 import thread
 import os
 import sys
@@ -14,18 +12,23 @@ import time
 if platform.system() == "Windows":
   import win32api
 
+import tasbot
+from tasbot.customlog import Log
+from tasbot.plugin import IPlugin
+from tasbot.utilities import parselist
+
+
 def parseportrange(arg):
 	separator = ":"
 	tempvariable = []
 	if ( arg.find( separator ) >= 0 ):
-		extremes = tasbot.ParseConfig.parselist(arg,separator)
+		extremes = parselist(arg,separator)
 		for num in range( int(extremes[0]), int(extremes[1]) +1 ):
 			tempvariable.append(str(num))
 	else:
 		tempvariable.append(arg)
 	return tempvariable
-	
-from tasbot.Plugin import IPlugin
+
 
 class Main(IPlugin):
 	def __init__(self,name,tasclient):
@@ -39,26 +42,29 @@ class Main(IPlugin):
 	def botthread(self,slot,nick,s,r,p,ist):
 		try:
 			self.say_ah("Spawning (Requested by %s) " % r +nick)
-			d = dict()
-			d.update([("serveraddr",self.app.config["serveraddr"])])
-			d.update([("spawnedby",r)])
-			d.update([("serverport",self.app.config["serverport"])])
-			d.update([("springdedpath",self.app.config["springdedpath"])])
-			if "springdatapath" in self.app.config:
-				d.update([("springdatapath",self.app.config["springdatapath"])])
-			if "bindip" in self.app.config:
-				d.update([("bindip",self.app.config["bindip"])])
-			d.update([("admins",self.app.config["admins"])])
-			d.update([("nick",nick)])
-			d.update([("password",p)])
-			d.update([("hostport",self.hostports[slot])])
-			d.update([("ahport",self.controlports[slot])])
-			d.update([("plugins","channels,autohost,help")])
-			d.update([("bans",self.app.config["bans"])])
-			d.update([("keepscript",self.app.config["keepscript"])])
 			cfg = "%s" % (nick+".cfg")
-			cfg_path = os.path.join(self.app.config['cfg_dir'],cfg )
-			tasbot.ParseConfig.writeconfigfile(cfg_path,d)
+			cfg_path = os.path.join(self.app.config.get('tasbot', 'cfg_dir'),cfg )
+			self.app.config.write(cfg_path)
+			slave_cfg = ConfigParser()
+			slave_cfg.read(cfg_path)
+			
+			#d.update([("serveraddr",self.app.config["serveraddr"])])
+			#d.update([("admins",self.app.config["admins"])])
+			#d.update([("serverport",self.app.config["serverport"])])
+			#d.update([("springdedpath",self.app.config["springdedpath"])])
+			#if "springdatapath" in self.app.config:
+				#d.update([("springdatapath",self.app.config["springdatapath"])])			
+			#if "bindip" in self.app.config:
+				#d.update([("bindip",self.app.config["bindip"])])
+			#d.update([("bans",self.app.config["bans"])])
+			#d.update([("keepscript",self.app.config["keepscript"])])
+			slave_cfg.set('autohost', "spawnedby", r)
+			slave_cfg.set('tasbot', "nick", nick)
+			slave_cfg.set('tasbot', "password", p)
+			slave_cfg.set('autohost', "hostport", self.hostports[slot])
+			slave_cfg.set('autohost', "ahport", self.controlports[slot])
+			slave_cfg.set('tasbot', "plugins", "join_channels,autohost,help")
+			slave_cfg.write(open(cfg_path, 'wb'))
 			#p = subprocess.Popen(("python","Main.py","-c", "%s" % (nick+".cfg")),stdout=sys.stdout)
 
 			inst = tasbot.DefaultApp( cfg_path, cfg_path+".pid", False, True)
@@ -75,40 +81,42 @@ class Main(IPlugin):
 				ist.updatestatus(s)
 			ist.botstatus[slot] = False
 		except Exception,e:
-			self.logger.Except( e )
+			self.logger.exception(e)
+
 	def onload(self,tasc):
 		self.tasclient = tasc
 		self.bans = []
 		self.app = tasc.main
-		self.bans = tasbot.ParseConfig.parselist(self.app.config["bans"],",")
+		self.bans = self.app.config.get_optionlist('autohost', "bans")
 		self.hostports = []
-		for port in tasbot.ParseConfig.parselist(self.app.config["hostports"],","):
+		for port in self.app.config.get_optionlist('autohost', "hostports"):
 			self.hostports = self.hostports + parseportrange( port )
 		self.controlports = []
-		for port in tasbot.ParseConfig.parselist(self.app.config["ahports"],","):
+		for port in self.app.config.get_optionlist('autohost', "ahports"):
 			self.controlports = self.controlports + parseportrange( port )
 		numhosts = min( len(self.hostports), len(self.controlports) ) # number of host is minimum between amount of free ports for host and amount of free ports for control
 		self.an = []
-		basenick = self.app.config["slavesnick"]
+		basenick = self.app.config.get('autohost', "slavesnick")
 		for i in range( 1, numhosts + 1 ): # fill the list of host names with the format of basenick + slot number
 			self.an.append( basenick + str(i) )
-		self.ap = self.app.config["slavespass"]
-		self.disabled = not bool(int(self.app.config["enabled"]))
+		self.ap = self.app.config.get('autohost', "slavespass")
+		self.disabled = not bool(int(self.app.config.get('autohost', "enabled")))
 		for i in range( 0, numhosts ):
 			self.botstatus.update([(i,False)])
+
 	def oncommandfromserver(self,command,args,socket):
 		try:
 			if command == "SAIDPRIVATE" and len(args) == 2 and args[1] == "!enable" and args[0] in self.app.admins:
 				self.disabled = False
 				socket.send("MYSTATUS %i\n" % int(int(self.listfull)+int(self.disabled)*2))
 				socket.send("SAYPRIVATE %s %s\n" % (args[0],"Hosting new games enabled"))
-				self.app.config["enabled"] = "1"
+				self.app.config.set('autohost', "enabled", "1")
 				self.app.SaveConfig()
 			elif command == "SAIDPRIVATE" and len(args) == 2 and args[1] == "!disable" and args[0] in self.app.admins:
 				self.disabled = True
 				socket.send("MYSTATUS %i\n" % int(int(self.listfull)+int(self.disabled)*2))
 				socket.send("SAYPRIVATE %s %s\n" % (args[0],"Hosting new games disabled"))
-				self.app.config["enabled"] = "0"
+				self.app.config.set('autohost', "enabled", "0")
 				self.app.SaveConfig()
 			elif command == "SAIDPRIVATE" and len(args) == 2 and args[1] == "!listbans" and args[0] in self.app.admins:
 				x = 0
@@ -129,7 +137,7 @@ class Main(IPlugin):
 						socket.send("SAYPRIVATE %s %s\n" % (args[0],b+" Banned"))
 					else:
 						socket.send("SAYPRIVATE %s %s\n" % (args[0],b+" is already banned"))
-				self.app.config["bans"] = ','.join(self.bans)
+				self.app.config.set('autohost', "bans", ','.join(self.bans))
 				self.app.SaveConfig()
 				socket.send("SAYPRIVATE %s %s\n" % (args[0],"Done."))
 			elif command == "SAIDPRIVATE" and len(args) >= 3 and args[1] == "!unban" and args[0] in self.app.admins:
@@ -140,7 +148,7 @@ class Main(IPlugin):
 					else:
 						self.bans.remove(b)
 						socket.send("SAYPRIVATE %s %s\n" % (args[0],b+" has been unbanned"))
-				self.app.config["bans"] = ','.join(self.bans)
+				self.app.config.set('autohost', "bans", ','.join(self.bans))
 				self.app.SaveConfig()
 				socket.send("SAYPRIVATE %s %s\n" % (args[0],"Done."))
 			elif command == "SAIDPRIVATE" and len(args) == 2 and args[1] == "!registerall" and args[0] in self.app.admins:
@@ -187,14 +195,15 @@ class Main(IPlugin):
 					  win32api.TerminateProcess(handle, 0)
 					else:
 					  os.kill(self.bots[args[1]],signal.SIGKILL)
-				except:
-					pass
-		except:
+				except Exception, e:
+					Log.exception(e)
+		except Exception, e:
 			exc = traceback.format_exception(sys.exc_info()[0],sys.exc_info()[1],sys.exc_info()[2])
 			self.sayex_ah("*** EXCEPTION: BEGIN")
 			for line in exc:
 				self.sayex_ah(line)
 			self.sayex_ah("*** EXCEPTION: END")
+			Log.exception(e)
 
 	def updatestatus(self,socket):
 		socket.send("MYSTATUS %i\n" % int(int(self.listfull)+int(self.disabled)*2))
@@ -205,12 +214,12 @@ class Main(IPlugin):
 	def say_ah(self,message):
 		try:
 			self.tasclient.say("autohost", message)
-		except:
+		except Exception:
 			pass
 
 	def sayex_ah(self,message):
 		try:
 			self.tasclient.sayex("autohost", message)
-		except:
+		except Exception:
 			pass		
 
