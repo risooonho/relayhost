@@ -7,9 +7,9 @@ class UDPint:
 	def __init__(self,port,messagecb,eventcb):
 		self.s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 		self.s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-		self.s.bind(("localhost",int(port)))
+		self.addr = ("localhost",int(port))
+		self.s.bind(self.addr)
 		self.players = dict()
-		self.addr = ""
 		thread.start_new_thread(self.mainloop,(messagecb,eventcb))
 		Log.info("UDP Listening on port "+str(port))
 
