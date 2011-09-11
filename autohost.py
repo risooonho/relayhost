@@ -13,7 +13,6 @@ if platform.system() == "Windows":
 
 from tasbot.utilities import *
 from tasbot.plugin import IPlugin
-from tasbot.customlog import Log
 
 import udpinterface
 
@@ -82,8 +81,9 @@ class Main(IPlugin):
 					self.logger.error("Timeouted hosting")
 					self.killbot()
 					return
-			except:
-				pass
+			except Exception,e:
+				self.logger.debug('hosting timeout')
+				self.logger.exception(e)
 
 	def startspring(self,socket,g):
 		currentworkingdir = os.getcwd()
@@ -130,7 +130,7 @@ class Main(IPlugin):
 					time.sleep(float(len(h))/900.0+0.05)
 			socket.send("MYSTATUS 0\n")
 			socket.send("SAYBATTLEEX *** Game ended\n")
-		except:
+		except Exception,e:
 			exc = traceback.format_exception(sys.exc_info()[0],sys.exc_info()[1],sys.exc_info()[2])
 			self.sayex("*** EXCEPTION: BEGIN")
 			for line in exc:
@@ -139,8 +139,8 @@ class Main(IPlugin):
 		try:
 			if int(self.app.config.get('autohost', "keepscript")) == 0:
 				os.remove(os.path.join(self.scriptbasepath,"%f.txt" % g))
-		except:
-			pass
+		except Exception,e:
+			self.logger.debug('failed to remove script')
 		os.chdir(currentworkingdir)
 		self.gamestarted = False
 		if self.noowner == True:
@@ -172,7 +172,7 @@ class Main(IPlugin):
 				try:
 					msg = " ".join(args[1:])
 					self.u.sayingame("/"+msg[1:])
-				except:
+				except Exception,e:
 					exc = traceback.format_exception(sys.exc_info()[0],sys.exc_info()[1],sys.exc_info()[2])
 					self.sayex("*** EXCEPTION: BEGIN")
 					for line in exc:
@@ -202,7 +202,7 @@ class Main(IPlugin):
 					try:
 						msg = " ".join(args[2:])
 						self.u.sayingame("/adduser "+msg)
-					except:
+					except Exception,e:
 						exc = traceback.format_exception(sys.exc_info()[0],sys.exc_info()[1],sys.exc_info()[2])
 						self.sayex("*** EXCEPTION: BEGIN")
 						for line in exc:
@@ -246,7 +246,7 @@ class Main(IPlugin):
 					try:
 						if ( self.tasclient.users[self.battleowner].bot ):
 							self.redirectspring = bool(args[2])
-					except:
+					except Exception,e:
 						exc = traceback.format_exception(sys.exc_info()[0],sys.exc_info()[1],sys.exc_info()[2])
 						self.sayex("*** EXCEPTION: BEGIN")
 						for line in exc:
@@ -256,7 +256,7 @@ class Main(IPlugin):
 					try:
 						if ( self.tasclient.users[self.battleowner].bot ):
 							self.redirectbattleroom = bool(args[2])
-					except:
+					except Exception,e:
 						exc = traceback.format_exception(sys.exc_info()[0],sys.exc_info()[1],sys.exc_info()[2])
 						self.sayex("*** EXCEPTION: BEGIN")
 						for line in exc:
@@ -270,7 +270,7 @@ class Main(IPlugin):
 					try:
 						msg = " ".join(args[1:])
 						self.u.sayingame(msg[1:])
-					except:
+					except Exception,e:
 						exc = traceback.format_exception(sys.exc_info()[0],sys.exc_info()[1],sys.exc_info()[2])
 						self.sayex("*** EXCEPTION: BEGIN")
 						for line in exc:
@@ -285,7 +285,7 @@ class Main(IPlugin):
 						g = time.time()
 						try:
 							os.remove(os.path.join(self.scriptbasepath,"%f.txt" % g))
-						except:
+						except Exception,e:
 							pass
 						f = open(os.path.join(self.scriptbasepath,"%f.txt" % g),"a")
 						s1 = self.script.find("MyPlayerName=")
@@ -332,7 +332,7 @@ class Main(IPlugin):
 						win32api.TerminateProcess(handle, 0)
 					else:
 						os.kill(self.pr.pid,signal.SIGKILL)
-				except:
+				except Exception,e:
 					pass
 				self.killbot()
 
@@ -347,7 +347,7 @@ class Main(IPlugin):
 						win32api.TerminateProcess(handle, 0)
 					else:
 						os.kill(self.pr.pid,signal.SIGKILL)
-				except:
+				except Exception,e:
 					pass
 				self.killbot()
 			self.noowner = True
