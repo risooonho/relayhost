@@ -71,7 +71,7 @@ class Main(IPlugin):
 
 	def killbot(self):
 		self.logger.info( "setting force_quit True" )
-		self.app.force_quit = True
+		self.app.dying = True
 
 	def timeoutthread(self):
 		while 1:
