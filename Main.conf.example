@@ -1,10 +1,10 @@
 [tasbot]
-serveraddr=springrts.com;
-serverport=8200;
-nick=NICK;
-password=PASSWORD;
-plugins=join_channels,manager,help,lag,systemlog;
-admins=YOURNICK,YOURNICK2;
+serveraddr=springrts.com
+serverport=8200
+nick=NICK
+password=PASSWORD
+plugins=manager,help,systemlog
+admins=YOURNICK,YOURNICK2
 logfile=$HOME/logs/relayhost.log
 pidfile=$HOME/pids/relayhost.pid
 springdedpath=/path/to/it
@@ -18,8 +18,8 @@ ahports=12000:14000, 5000
 bans=[][]aweres[],[P][E]aweres[E][T],[PinK]Aweres[t],HOMOTINTTI
 keepscript=0
 enabled=1
-#bindip=; if this line is present, it will force spring-dec to bind to given interface
-#springdatapath=; force springdatapath if present
+#bindip= if this line is present, it will force spring-dec to bind to given interface
+#springdatapath= force springdatapath if present
 
 [join_channels]
 channels=autohost
