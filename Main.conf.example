@@ -1,5 +1,5 @@
 [tasbot]
-serveraddr=springrts.com
+serveraddr=lobby.springrts.com
 serverport=8200
 nick=NICK
 password=PASSWORD
