@@ -292,12 +292,15 @@ class Main(IPlugin):
 						s2 = self.script[s1:].find(";")+1+s1
 						self.script = self.script.replace(self.script[s1:s2],"MyPlayerName=%s;\n\tAutoHostPort=%i;" % 
 							(self.app.config.get('tasbot', "nick"),int(self.app.config.get('autohost', "ahport"))))
-						s1 = self.script.find("HostIP=")
-						s2 = self.script[s1:].find(";")+1+s1
 						if self.app.config.has_option('autohost', "bindip"):
-							self.script = self.script.replace(self.script[s1:s2],"HostIP=%s;" % (self.app.config.get('autohost', "bindip")))
-						else:
-							self.script = self.script[0:s1] + self.script[s2:]
+							bindip = self.app.config.get('autohost', "bindip")
+							s1 = self.script.find("HostIP=")
+							if s1: # replace existing line
+								s2 = self.script[s1:].find(";")+1+s1
+								self.script = self.script.replace(self.script[s1:s2],"HostIP=%s;" % (bindip))
+							else: # add new entry at top of file
+								index = self.script.find('{')
+								self.script = self.script[:index] +"HostIP=%s\n;" %(bindip) + self.script[index:]
 						f.write(self.script)
 						f.close()
 						thread.start_new_thread(self.startspring,(s,g))
