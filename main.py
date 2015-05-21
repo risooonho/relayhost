@@ -9,8 +9,9 @@ if __name__=="__main__":
 	tasbot.check_min_version((1,))
 	configfile = "Main.conf"
 	config = tasbot.config.Config(configfile)
-	Log.init( config.get('tasbot','logfile','relayhost.log'), 'info', True )
-	
+	Log.init(config.get('tasbot', 'logfile', 'relayhost.log'),
+			 config.get('tasbot', 'loglevel', 'info'), True )
+
 	r = False
 	for arg in sys.argv:
 		if arg.strip() == "-r":
@@ -23,4 +24,3 @@ if __name__=="__main__":
 		inst.run()#exec in fg
 	else:
 		inst.start()
-
