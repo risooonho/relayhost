@@ -16,6 +16,16 @@ from tasbot.plugin import IPlugin
 
 import udpinterface
 
+
+def addorreplace(scripttxt, key, value):
+	s1 = scripttxt.find(key + "=")
+	if s1 >= 0: # replace existing line
+		s2 = scripttxt.find(";", s1) + 1
+		return scripttxt.replace(scripttxt[s1:s2],"%s=%s;" % (key, value), 1)
+	# add new entry at top of file
+	index = scripttxt.find('{') + 1
+	return scripttxt[:index] +"\n\t%s=%s;\n" %(key, value) + scripttxt[index:]
+
 class Main(IPlugin):
 	def __init__(self,name,tasclient):
 		IPlugin.__init__(self,name,tasclient)
@@ -288,19 +298,11 @@ class Main(IPlugin):
 						except Exception,e:
 							pass
 						f = open(os.path.join(self.scriptbasepath,"%f.txt" % g),"a")
-						s1 = self.script.find("MyPlayerName=")
-						s2 = self.script[s1:].find(";")+1+s1
-						self.script = self.script.replace(self.script[s1:s2],"MyPlayerName=%s;\n\tAutoHostPort=%i;" % 
-							(self.app.config.get('tasbot', "nick"),int(self.app.config.get('autohost', "ahport"))))
+						self.script = addorreplace(self.script, "HostPort", self.app.config.get('autohost', 'hostport'))
+						self.script = addorreplace(self.script, "MyPlayerName", self.app.config.get('tasbot', "nick"))
+						self.script = addorreplace(self.script, "AutoHostPort", self.app.config.get('autohost', "ahport"))
 						if self.app.config.has_option('autohost', "bindip"):
-							bindip = self.app.config.get('autohost', "bindip")
-							s1 = self.script.find("HostIP=")
-							if s1: # replace existing line
-								s2 = self.script[s1:].find(";")+1+s1
-								self.script = self.script.replace(self.script[s1:s2],"HostIP=%s;" % (bindip))
-							else: # add new entry at top of file
-								index = self.script.find('{')
-								self.script = self.script[:index] +"HostIP=%s\n;" %(bindip) + self.script[index:]
+							self.script = addorreplace(self.script,"HostIP", self.app.config.get('autohost', "bindip"))
 						f.write(self.script)
 						f.close()
 						thread.start_new_thread(self.startspring,(s,g))
