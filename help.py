@@ -1,5 +1,5 @@
 import string
-helptext = "Relayed Host Bot\n Documentation is at https://github.com/renemilk/relayhost/wiki"
+helptext = "Relayed Host Bot\n Documentation is at https://github.com/springlobby/relayhost/wiki"
 from tasbot.plugin import IPlugin
 
 class Main(IPlugin):
