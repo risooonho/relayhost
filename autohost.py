@@ -50,6 +50,7 @@ class Main(IPlugin):
 		self.redirectbattleroom = False
 		self.users = dict()
 		self.logger.debug( "INIT MoTH" )
+		self.u = None
 
 	def ecb(self,event,data):
 		if self.redirectspring:
@@ -82,6 +83,7 @@ class Main(IPlugin):
 	def killbot(self):
 		self.logger.info( "setting force_quit True" )
 		self.app.dying = True
+		self.u.running = False
 
 	def timeoutthread(self):
 		while 1:
@@ -164,7 +166,8 @@ class Main(IPlugin):
 			self.app = tasc.main
 			self.hosttime = time.time()
 			self.start_thread(self.timeoutthread)
-			self.u = udpinterface.UDPint(int(self.app.config.get('autohost', "ahport")),self.mscb,self.ecb)
+			if not self.u:
+				self.u = udpinterface.UDPint(int(self.app.config.get('autohost', "ahport")),self.mscb,self.ecb)
 		except Exception, e:
 			self.logger.exception(e)
 

@@ -7,9 +7,12 @@ class UDPint:
 	def __init__(self,port,messagecb,eventcb):
 		self.s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 		self.s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+		self.s.settimeout(5.0)
 		self.addr = ("localhost",int(port))
 		self.s.bind(self.addr)
 		self.players = dict()
+		self.running = True
+		self.port = port
 		thread.start_new_thread(self.mainloop,(messagecb,eventcb))
 		Log.info("UDP Listening on port "+str(port))
 
@@ -17,9 +20,15 @@ class UDPint:
 		self.players = dict()
 
 	def mainloop(self,messagecb,eventcb):
-		while 1:
-			try:
-				data, address = self.s.recvfrom(8192)
+		try:
+			while self.running:
+				try:
+					data, address = self.s.recvfrom(8192)
+				except socket.timeout:
+					if self.running:
+						continue
+					else:
+						break
 				self.addr = address
 				event = ord(data[0])
 				#print "Received event %i from %s" % (event,str(address))
@@ -35,8 +44,10 @@ class UDPint:
 				if event == 3: #gameover
 					self.sayingame("/kill")
 				eventcb(ord(data[0]),data[1:])
-			except Exception, e:
-				Log.exception( e )
+		except Exception, e:
+			Log.exception( e )
+		self.logger.info( "Closing autohost interface %d" %(self.port) )
+		self.s.close()
 
 	def sayingame(self,text):
 		#print "Sending %s to spring" % text
