@@ -8,6 +8,7 @@ import subprocess
 import platform
 import sys
 import traceback
+import glob
 if platform.system() == "Windows":
 	import win32api
 
@@ -50,6 +51,7 @@ class Main(IPlugin):
 		self.redirectbattleroom = False
 		self.users = dict()
 		self.logger.debug( "INIT MoTH" )
+		self.engineversion = ""
 		self.u = None
 
 	def ecb(self,event,data):
@@ -96,6 +98,24 @@ class Main(IPlugin):
 			except Exception,e:
 				self.logger.debug('hosting timeout')
 				self.logger.exception(e)
+	def getspringded(self, enginever):
+		ver = os.path.basename(enginever)
+		res = self.app.config.get('tasbot', 'springdedpath').replace("{ENGINEVER}", ver)
+		if os.path.isfile(res) and os.access(res, os.X_OK):
+			return res
+		return ""
+
+	def getenginelist(self):
+		vers = glob.glob(self.app.config.get('tasbot', 'springdedpath').split("{ENGINEVER}")[0] + "*")
+		res = []
+		for ver in vers:
+			if not os.path.isdir(ver):
+				continue
+			name = os.path.basename(ver)
+			if not self.getspringded(name):
+				continue
+			res.append(name)
+		return sorted(res)
 
 	def startspring(self,socket,g):
 		currentworkingdir = os.getcwd()
@@ -109,11 +129,9 @@ class Main(IPlugin):
 			socket.send("MYSTATUS 1\n")
 			st = time.time()
 			#status,j = commands.getstatusoutput("spring-dedicated "+os.path.join(self.scriptbasepath,"%f.txt" % g ))
-			self.sayex("*** Starting spring: command line \"%s\"" % (self.app.config.get('tasbot', "springdedpath")+" "+os.path.join(self.scriptbasepath,"%f.txt" % g )))
-			if platform.system() == "Windows":
-				dedpath = "\\".join(self.app.config.get('tasbot', "springdedpath").replace("/","\\").split("\\")[:self.app.config.get('tasbot', "springdedpath").replace("/","\\").count("\\")])
-				if not dedpath in sys.path:
-					sys.path.append(dedpath)
+			springded = self.getspringded(self.engineversion)
+			scripttxt = os.path.join(self.scriptbasepath,"%f.txt" % g )
+			self.sayex('*** Starting spring: command line "%s %s"' % (springded, scripttxt))
 			if self.app.config.has_option('tasbot', "springdatapath"):
 				springdatapath = self.app.config.get('tasbot', "springdatapath")
 				if not springdatapath in sys.path:
@@ -123,7 +141,7 @@ class Main(IPlugin):
 				springdatapath = None
 			if springdatapath!= None:
 				os.environ['SPRING_DATADIR'] = springdatapath
-			self.pr = subprocess.Popen((self.app.config.get('tasbot', "springdedpath"),os.path.join(self.scriptbasepath,"%f.txt" % g )),stdout=subprocess.PIPE,stderr=subprocess.STDOUT,cwd=springdatapath)
+			self.pr = subprocess.Popen((springded, scripttxt),stdout=subprocess.PIPE,stderr=subprocess.STDOUT,cwd=springdatapath)
 			self.gamestarted = True
 			l = self.pr.stdout.readline()
 			while len(l) > 0:
@@ -195,17 +213,28 @@ class Main(IPlugin):
 		if command == "REQUESTBATTLESTATUS":
 			s.send( "MYBATTLESTATUS 4194816 255\n" )#spectator+synced/white
 		if command == "SAIDPRIVATE" and args[0] not in self.app.config.get('autohost', "bans") and args[0] == self.app.config.get('autohost', "spawnedby"):
-			if args[1] == "!openbattle" and not self.hosted == 1:
-				if len(args) < 6:
-					self.logger.error("Got invalid openbattle with params:"+" ".join(args))
+			if args[1] == "!openbattle":
+				if self.hosted == 1:
+					self.saypm(args[0],"E1 | Battle is already hosted")
 					return
+				if len(args) < 6:
+					self.logger.error("Got invalid openbattle with params:" + " ".join(args))
+					return
+				# last arg / first tab
+				engineversion = " ".join(args).split("\t")[1]
+				ded = self.getspringded(engineversion)
+				if not ded:
+					self.logger.error("Invalid engine version received:" + engineversion)
+					self.saypm(args[0], "Engine version %s isn't installed on the relayhost. Available versions are: " %(engineversion))
+					for ver in self.getenginelist():
+						self.saypm(args[0], ver)
+					return
+				self.logger.info("Using version %s for hosting" %(engineversion))
+				self.engineversion = engineversion
 				args[5] = self.app.config.get('autohost',"hostport")
 				self.logger.info("OPENBATTLE "+" ".join(args[2:]))
 				s.send("OPENBATTLE "+" ".join(args[2:])+"\n")
 				self.battleowner = args[0]
-				return
-			elif args[1] == "!openbattle" and self.hosted == 1:
-				self.saypm(args[0],"E1 | Battle is already hosted")
 				return
 			elif args[1] == "!supportscriptpassword":
 				self.redirectjoins = True
