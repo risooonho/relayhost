@@ -2,3 +2,4 @@
 Main.conf
 *~
 *.pyc
+*.pid
